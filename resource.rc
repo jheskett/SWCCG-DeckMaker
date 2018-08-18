@@ -1,0 +1,508 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_SWCCGDM             ICON    DISCARDABLE     "Swccgdm.ico"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTDLG DIALOG DISCARDABLE  20, 10, 235, 143
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "About the SW:CCG DeckMaker"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,91,125,54,14
+    RTEXT           "The Star Wars Customizable Card Game DeckMaker",
+                    IDC_STATIC,51,12,176,11
+    CTEXT           "Version 3.0 for Windows 95",IDC_STATIC,79,24,97,10
+    CTEXT           "July 22, 1996",IDC_STATIC,179,24,53,10
+    CTEXT           "The SW:CCG DeckMaker is a freeware program designed to help build SW:CCG decks and to keep track of your SW:CCG collection.  All game info is TM and (c) of Decipher, Inc. and LucasArts Ltd.",
+                    IDC_STATIC,7,39,221,32
+    LTEXT           "Premiere: Kevin (loganp@nauticom.net)",IDC_STATIC,69,85,
+                    152,10
+    LTEXT           "A New Hope: Chris Gregg (chris@texas.net)",IDC_STATIC,
+                    69,95,152,10
+    RTEXT           "Spoilers:",IDC_STATIC,9,85,49,10
+    RTEXT           "Program:",IDC_STATIC,16,75,42,10
+    LTEXT           "Jeff Heskett (jeffh@panax.com)",IDC_STATIC,69,75,152,10
+    LTEXT           "http://www.panax.com/~jeffh/index.html",IDC_STATIC,69,
+                    109,153,12
+    RTEXT           "Web site:",IDC_STATIC,1,109,57,9
+    ICON            IDI_SWCCGDM,IDC_STATIC,25,11,21,20
+END
+
+IDD_EDITDLG DIALOG DISCARDABLE  0, 0, 227, 154
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Card Editor"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_EDITATTRIBUTES,7,18,103,15,ES_UPPERCASE | 
+                    ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDITNAME,7,51,103,15,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDITGAMETEXT,117,26,103,94,ES_MULTILINE | 
+                    ES_AUTOVSCROLL | ES_WANTRETURN
+    EDITTEXT        IDC_EDITLORE,7,83,103,37,ES_MULTILINE | ES_AUTOVSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,25,133,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,89,133,50,14
+    LTEXT           "Card Attributes",IDC_STATIC,8,8,71,10
+    LTEXT           "Card Name",IDC_STATIC,8,36,71,10
+    CTEXT           "Game Text",IDC_STATIC,117,9,103,11
+    LTEXT           "Lore",IDC_STATIC,8,72,71,10
+    PUSHBUTTON      "&Help",IDHELP,153,133,49,14
+END
+
+IDD_EXCLUDEDLG DIALOG DISCARDABLE  0, 0, 162, 114
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Exclude cards from the list"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LISTBOX         IDC_EXCLUDELIST,7,8,90,86,LBS_SORT | LBS_MULTIPLESEL | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,105,57,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,105,75,50,14
+    PUSHBUTTON      "Help",IDHELP,105,93,50,14
+    CONTROL         "Keep ""used"" cards",IDC_LEAVE_USED,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,97,93,10
+    CTEXT           "Select which categories to remove.",IDC_STATIC,105,16,
+                    50,27
+END
+
+IDD_HELPDLG DIALOG DISCARDABLE  0, 0, 185, 125
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "DeckMaker Help"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,7,103,171,15
+    EDITTEXT        IDC_HELPEDIT,7,7,171,90,ES_MULTILINE | ES_READONLY | 
+                    ES_WANTRETURN | WS_VSCROLL
+END
+
+IDD_SORTDLG DIALOG DISCARDABLE  40, 15, 182, 162
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Custom Sort"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "Side",IDC_SORTSIDE,7,42,38,12
+    PUSHBUTTON      "Set",IDC_SORTSET,7,57,38,12
+    PUSHBUTTON      "Rarity",IDC_SORTRARITY,7,72,38,12
+    PUSHBUTTON      "Destiny",IDC_SORTDESTINY,7,87,38,12
+    PUSHBUTTON      "Type",IDC_SORTTYPE,7,102,38,12
+    PUSHBUTTON      "Subtype",IDC_SORTSUBTYPE,7,117,38,12
+    PUSHBUTTON      "Power",IDC_SORTPOWER,51,42,38,12
+    PUSHBUTTON      "Ability",IDC_SORTABILITY,51,57,38,12
+    PUSHBUTTON      "Deploy",IDC_SORTDEPLOY,51,72,38,12
+    PUSHBUTTON      "Forfeit",IDC_SORTFORFEIT,51,87,38,12
+    PUSHBUTTON      "<<<",IDC_SORTBACK,51,102,38,12
+    DEFPUSHBUTTON   "OK",IDOK,7,141,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,66,141,50,14
+    PUSHBUTTON      "Help",IDHELP,125,141,50,14
+    LISTBOX         IDC_SORTLIST,97,43,78,86,LBS_NOINTEGRALHEIGHT | 
+                    LBS_NOSEL | WS_VSCROLL
+    CTEXT           "Press the buttons in the order that you want the cards to sort.  (by Name is always the last sort)  ie, to list by side/set/rarity, press Side, then Set, then Rarity.",
+                    IDC_STATIC,7,7,168,30
+    PUSHBUTTON      "start over",IDC_SORTCLEAR,51,117,38,12
+END
+
+IDD_SPLASHDLG DIALOG DISCARDABLE  0, 0, 297, 122
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_POPUP | WS_VISIBLE
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         171,IDC_STATIC,"Static",SS_BITMAP | SS_SUNKEN,15,14,113,
+                    94
+    CTEXT           "Version 3.0b    Program by Jeff Heskett",IDC_STATIC,134,
+                    16,151,9
+    CTEXT           "TM && ©1996 Decipher Inc. Decipher, Customizable Card Game, The Art of Great Games and associated marks and intellectual property are exclusively owned by Decipher Inc. All Rights Reserved.",
+                    IDC_STATIC,134,30,151,43
+    CTEXT           "TM && ©1996 Lucasfilm Ltd. All Rights Reserved. Star Wars and related marks are trademarks of Lucasfilm Ltd.",
+                    IDC_STATIC,134,78,151,27
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDFRAME,7,7,283,108
+END
+
+IDD_INCLUDEDLG DIALOG DISCARDABLE  0, 0, 162, 114
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Include cards to the list"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LISTBOX         IDC_EXCLUDELIST,7,8,90,99,LBS_SORT | LBS_MULTIPLESEL | 
+                    LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,105,57,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,105,75,50,14
+    PUSHBUTTON      "Help",IDHELP,105,93,50,14
+    CTEXT           "Select which categories to add.",IDC_STATIC,105,16,50,
+                    27
+END
+
+IDD_DECKDLG DIALOG DISCARDABLE  300, 50, 170, 126
+STYLE WS_VISIBLE | WS_CAPTION | WS_THICKFRAME
+CAPTION "Deck"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "Cards: 0",IDC_DECKCARDS,0,0,84,12,SS_SUNKEN
+    CTEXT           "Destiny",IDC_DECKDESTINY,86,0,83,12,SS_SUNKEN
+    LISTBOX         IDC_DECKLIST,0,13,169,114,LBS_USETABSTOPS | 
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | WS_VSCROLL | 
+                    WS_TABSTOP
+END
+
+IDD_PRICEDLG DIALOG DISCARDABLE  0, 0, 177, 122
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Card Value Editor"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_PRICE_NEW,97,78,33,12,ES_RIGHT | ES_MULTILINE
+    DEFPUSHBUTTON   "OK",IDOK,7,101,50,14
+    CONTROL         "Edit Source",IDC_PRICE_EDITSOURCE,"Button",
+                    BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_RIGHT | BS_VCENTER | 
+                    WS_TABSTOP,101,34,52,9
+    EDITTEXT        IDC_PRICE_SOURCE,7,7,163,22,ES_CENTER | ES_MULTILINE | 
+                    ES_READONLY | ES_WANTRETURN
+    EDITTEXT        IDC_PRICE_ASOF,47,32,48,12,ES_READONLY
+    PUSHBUTTON      "Cancel",IDCANCEL,63,101,50,14
+    PUSHBUTTON      "Help",IDHELP,119,101,50,14
+    GROUPBOX        "",IDC_STATIC,7,46,163,50
+    RTEXT           "As of",IDC_STATIC,23,34,20,9
+    CTEXT           "asdasdas",IDC_PRICE_CARDNAME,10,55,157,8
+    CTEXT           "Old",IDC_STATIC,48,67,33,8
+    CTEXT           "New",IDC_STATIC,97,67,33,8
+    EDITTEXT        IDC_PRICE_OLD,48,78,33,12,ES_RIGHT | ES_MULTILINE | 
+                    ES_READONLY
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_ABOUTDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 232
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 139
+    END
+
+    IDD_EDITDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 220
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 147
+    END
+
+    IDD_EXCLUDEDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 155
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 107
+    END
+
+    IDD_HELPDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 178
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 118
+    END
+
+    IDD_SORTDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 175
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 155
+    END
+
+    IDD_SPLASHDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 290
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 115
+    END
+
+    IDD_INCLUDEDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 155
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 107
+    END
+
+    IDD_DECKDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 163
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_PRICEDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 170
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 115
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        POPUP "&New"
+        BEGIN
+            MENUITEM "&All",                        ID_FILE_NEW_ALL
+            MENUITEM "&Light",                      ID_FILE_NEW_LIGHT
+            MENUITEM "&Dark",                       ID_FILE_NEW_DARK
+        END
+        MENUITEM "&Open...",                    ID_FILE_OPEN
+        MENUITEM "&Save",                       ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVEAS
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_FILE_EXIT
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "E&xclude...",                 ID_VIEW_EXCLUDE
+        MENUITEM "I&nclude...",                 ID_VIEW_INCLUDE
+        MENUITEM SEPARATOR
+        POPUP "&Font"
+        BEGIN
+            MENUITEM "&Compressed",                 ID_VIEW_FONT_COMPRESSED
+            MENUITEM "&Bold",                       ID_VIEW_FONT_BOLD
+        END
+        POPUP "&Icons"
+        BEGIN
+            MENUITEM "&Type",                       ID_VIEW_ICONS_TYPE
+            , CHECKED
+            MENUITEM "&Destiny",                    ID_VIEW_ICONS_DESTINY
+            , CHECKED
+            MENUITEM "&Rarity",                     ID_VIEW_ICONS_RARITY
+            , CHECKED
+            MENUITEM "&Set",                        ID_VIEW_ICONS_SET
+            , CHECKED
+            MENUITEM "E&xtra",                      ID_VIEW_ICONS_EXTRA
+            , CHECKED
+        END
+        POPUP "&Card Names"
+        BEGIN
+            MENUITEM "in &Color",                   ID_VIEW_CARDNAMES_COLOR
+            , CHECKED
+            MENUITEM "with &Dark Shaded",           ID_VIEW_CARDNAMES_DARKSHADED
+            , CHECKED
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "&Deck Window",                ID_VIEW_DECKWINDOW, CHECKED
+        MENUITEM "Deck Quantity",               ID_VIEW_DECKQUANTITY
+        , CHECKED
+        MENUITEM "Ignore Unlimited",            ID_OPTIONS_IGNOREUNLIMITED
+    END
+    POPUP "&Sort"
+    BEGIN
+        MENUITEM "by &Name",                    ID_SORT_BYNAME, CHECKED
+        MENUITEM "by &Type",                    ID_SORT_BYTYPE
+        MENUITEM "by &Rarity",                  ID_SORT_BYRARITY
+        MENUITEM "by &Destiny",                 ID_SORT_BYDESTINY
+        MENUITEM "by &Custom sort",             ID_SORT_BYCUSTOM
+        MENUITEM SEPARATOR
+        MENUITEM "by S&ides also",              ID_SORT_BYSIDEFIRST
+        MENUITEM "by S&ets also",               ID_SORT_BYSETSFIRST
+        MENUITEM SEPARATOR
+        MENUITEM "De&fine Custom sort...",      ID_SORT_DEFINECUSTOM
+    END
+    MENUITEM "S&tatistics",                 65535
+    POPUP "&Options"
+    BEGIN
+        MENUITEM "E&xport",                     ID_DATAFILES_EXPORT, GRAYED
+        MENUITEM "&Import",                     ID_DATAFILES_IMPORT, GRAYED
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About...",                   ID_HELP_ABOUT
+    END
+END
+
+IDR_CARDMENU MENU DISCARDABLE 
+BEGIN
+    POPUP " "
+    BEGIN
+        MENUITEM "Enter &Qty...",               ID__ENTERQTY
+        MENUITEM "&Zero Qty",                   ID__ZEROQTY
+        MENUITEM "E&xclude",                    ID__EXCLUDE
+        MENUITEM SEPARATOR
+        MENUITEM "Edit Value...&0",             ID__EDITPRICE
+        MENUITEM "Edit &Card...",               ID__EDITCARD
+        MENUITEM SEPARATOR
+        MENUITEM "Cancel",                      ID__CANCEL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_WEAPON              BITMAP  DISCARDABLE     "pics\\weapon.bmp"
+IDB_CREATURE            BITMAP  DISCARDABLE     "pics\\creature.bmp"
+IDB_DEJARIK             BITMAP  DISCARDABLE     "pics\\dejarik.bmp"
+IDB_DEST0               BITMAP  DISCARDABLE     "pics\\dest0.bmp"
+IDB_DEST1               BITMAP  DISCARDABLE     "pics\\dest1.bmp"
+IDB_DEST2               BITMAP  DISCARDABLE     "pics\\dest2.bmp"
+IDB_DEST3               BITMAP  DISCARDABLE     "pics\\dest3.bmp"
+IDB_DEST4               BITMAP  DISCARDABLE     "pics\\dest4.bmp"
+IDB_DEST5               BITMAP  DISCARDABLE     "pics\\dest5.bmp"
+IDB_DEST6               BITMAP  DISCARDABLE     "pics\\dest6.bmp"
+IDB_DEVICE              BITMAP  DISCARDABLE     "pics\\device.bmp"
+IDB_DROID               BITMAP  DISCARDABLE     "pics\\droid.bmp"
+IDB_EVENT               BITMAP  DISCARDABLE     "pics\\event.bmp"
+IDB_EXTERIOR            BITMAP  DISCARDABLE     "pics\\exterior.bmp"
+IDB_FORCE0              BITMAP  DISCARDABLE     "pics\\force0.bmp"
+IDB_ASTRO               BITMAP  DISCARDABLE     "pics\\hyperdrive.bmp"
+IDB_IFORCE1             BITMAP  DISCARDABLE     "pics\\iforce1.bmp"
+IDB_IFORCE2             BITMAP  DISCARDABLE     "pics\\iforce2.bmp"
+IDB_IFORCE3             BITMAP  DISCARDABLE     "pics\\iforce3.bmp"
+IDB_IMMEDIATE           BITMAP  DISCARDABLE     "pics\\immediate.bmp"
+IDB_IMPERIAL            BITMAP  DISCARDABLE     "pics\\imperial.bmp"
+IDB_INTERIOR            BITMAP  DISCARDABLE     "pics\\interior.bmp"
+IDB_INTERRUPT           BITMAP  DISCARDABLE     "pics\\interrupt.bmp"
+IDB_LIMITED             BITMAP  DISCARDABLE     "pics\\limited.bmp"
+IDB_LOST                BITMAP  DISCARDABLE     "pics\\lost.bmp"
+IDB_MOBILE              BITMAP  DISCARDABLE     "pics\\mobile.bmp"
+IDB_PARKERBROS          BITMAP  DISCARDABLE     "pics\\parker.bmp"
+IDB_DESTPI              BITMAP  DISCARDABLE     "pics\\pi.bmp"
+IDB_PILOT               BITMAP  DISCARDABLE     "pics\\pilot.bmp"
+IDB_C1                  BITMAP  DISCARDABLE     "pics\\rarec1.bmp"
+IDB_C2                  BITMAP  DISCARDABLE     "pics\\rarec2.bmp"
+IDB_C3                  BITMAP  DISCARDABLE     "pics\\rarec3.bmp"
+IDB_NA                  BITMAP  DISCARDABLE     "pics\\rarena.bmp"
+IDB_R1                  BITMAP  DISCARDABLE     "pics\\rarer1.bmp"
+IDB_R2                  BITMAP  DISCARDABLE     "pics\\rarer2.bmp"
+IDB_U1                  BITMAP  DISCARDABLE     "pics\\rareu1.bmp"
+IDB_U2                  BITMAP  DISCARDABLE     "pics\\rareu2.bmp"
+IDB_REBEL               BITMAP  DISCARDABLE     "pics\\rebel.bmp"
+IDB_RFORCE1             BITMAP  DISCARDABLE     "pics\\rforce1.bmp"
+IDB_RFORCE2             BITMAP  DISCARDABLE     "pics\\rforce2.bmp"
+IDB_RFORCE3             BITMAP  DISCARDABLE     "pics\\rforce3.bmp"
+IDB_REBELLEADER         BITMAP  DISCARDABLE     "pics\\rl.bmp"
+IDB_SCOMP               BITMAP  DISCARDABLE     "pics\\scomp.bmp"
+IDB_SHIP                BITMAP  DISCARDABLE     "pics\\ship.bmp"
+IDB_SYSTEM              BITMAP  DISCARDABLE     "pics\\system.bmp"
+IDB_UNLIMITED           BITMAP  DISCARDABLE     "pics\\unlimited.bmp"
+IDB_UORL                BITMAP  DISCARDABLE     "pics\\usedorlost.bmp"
+IDB_UTINNI              BITMAP  DISCARDABLE     "pics\\utinni.bmp"
+IDB_VEHICLE             BITMAP  DISCARDABLE     "pics\\vehicle.bmp"
+IDB_WARRIOR             BITMAP  DISCARDABLE     "pics\\warrior.bmp"
+IDB_BLANK               BITMAP  DISCARDABLE     "pics\\blank.bmp"
+IDB_EFFECT              BITMAP  DISCARDABLE     "pics\\effect.bmp"
+IDB_ALIEN               BITMAP  DISCARDABLE     "pics\\alien.bmp"
+IDB_ANH                 BITMAP  DISCARDABLE     "pics\\anh.bmp"
+IDB_BLANKROW            BITMAP  DISCARDABLE     "pics\\bitmap1.bmp"
+IDB_SPLASH              BITMAP  DISCARDABLE     "swdm256.bmp"
+IDB_HOTH                BITMAP  DISCARDABLE     "pics\\hoth.bmp"
+IDB_DEST7               BITMAP  DISCARDABLE     "pics\\dest7.bmp"
+IDB_DEPLOY1             BITMAP  DISCARDABLE     "pics\\deploy1.bmp"
+IDB_DEPLOY2             BITMAP  DISCARDABLE     "pics\\deploy2.bmp"
+IDB_DEPLOY3             BITMAP  DISCARDABLE     "pics\\deploy3.bmp"
+IDB_DEPLOY4             BITMAP  DISCARDABLE     "pics\\deploy4.bmp"
+IDB_DEPLOY5             BITMAP  DISCARDABLE     "pics\\deploy5.bmp"
+IDB_DEPLOY6             BITMAP  DISCARDABLE     "pics\\deploy6.bmp"
+IDB_DEPLOY7             BITMAP  DISCARDABLE     "pics\\deploy7.bmp"
+IDB_DEPLOY8             BITMAP  DISCARDABLE     "pics\\deploy8.bmp"
+IDB_DEPLOY9             BITMAP  DISCARDABLE     "pics\\deploy9.bmp"
+IDB_DEPLOYX             BITMAP  DISCARDABLE     "pics\\deployx.bmp"
+IDB_DEPLOY0             BITMAP  DISCARDABLE     "pics\\deploy0.bmp"
+IDB_DESTX               BITMAP  DISCARDABLE     "pics\\destx.bmp"
+IDB_FORFEIT0            BITMAP  DISCARDABLE     "pics\\forfeit0.bmp"
+IDB_FORFEIT1            BITMAP  DISCARDABLE     "pics\\forfeit1.bmp"
+IDB_FORFEIT2            BITMAP  DISCARDABLE     "pics\\forfeit2.bmp"
+IDB_FORFEIT3            BITMAP  DISCARDABLE     "pics\\forfeit3.bmp"
+IDB_FORFEIT4            BITMAP  DISCARDABLE     "pics\\forfeit4.bmp"
+IDB_FORFEIT5            BITMAP  DISCARDABLE     "pics\\forfeit5.bmp"
+IDB_FORFEIT6            BITMAP  DISCARDABLE     "pics\\forfeit6.bmp"
+IDB_FORFEIT7            BITMAP  DISCARDABLE     "pics\\forfeit7.bmp"
+IDB_FORFEIT8            BITMAP  DISCARDABLE     "pics\\forfeit8.bmp"
+IDB_FORFEIT9            BITMAP  DISCARDABLE     "pics\\forfeit9.bmp"
+IDB_FORFEITX            BITMAP  DISCARDABLE     "pics\\forfeitx.bmp"
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
