@@ -6,57 +6,14 @@
 #include <windows.h>
 #include <io.h>
 #include <stdio.h>
+#include "attributes.h"
 #include "SWDeck.h"
 #include "SWFile.h"
-#include "attributes.h"
 #include "help.h"
 #include "resource.h"
 #include <commctrl.h>
 #include "SWSpoilers.h"
 #include "SWStats.h"
-
-// Variables declared in SWDeck.h
-char *pCardData;		// a long string of the loaded swccgdm data
-int iMListSize;			// number of masterlist entries in pCardData
-int iCListSize;			// number of entries in the cardlist
-int iDListSize;			// number of entries in the decklist
-
-struct mcard masterlist[MAXLIST];
-
-struct card cardlist[MAXLIST];
-struct card decklist[MAXLIST];
-char sets[MAXSETS][30];	// defined in WM_CREATE from swccgdm.set: set names
-						// and codes. sets[][0]==code, sets[][1]==name
-HWND    hDlgStats;
-
-HBITMAP	hIcons[NUMICONS];
-HBITMAP hBlankRow;
-HBRUSH	hDarkBrush;
-BOOL	bHighColorMode;
-HBRUSH	hBr[8];
-
-struct menustates menu;
-
-UINT	uSortOrder;
-UINT	uPrevStats;
-
-char  szCustomSort[MAXSORT];
-char  szSort[MAXSORT];
-RECT	rMainWin,rDeckWin,rInfoWin,rStatsWin;
-
-char  szPriceGuideSource[512];
-char  szPriceGuideDate[16];
-
-BOOL  bPriceGuideChanged;
-
-char szIni[_MAX_PATH];
-
-int	 iOrderMode;
-
-char szTypeOrder[32];
-
-// End Variables declared in SWDeck.h
-
 
 BOOL LoadPriceGuide(void);
 BOOL SavePriceGuide(void);
@@ -84,13 +41,16 @@ int	OpenSWCCGData(HWND hwndSplash)
 	int		i,j;
 	FILE	*fh;
 	struct mcard cheatsheet;
+	char fn[_MAX_PATH];
 
 	if (createworkfile(GetDlgItem(hwndSplash,IDC_LOADPROGRESS))==FALSE)
 		return CANT_OPEN_DATA;
 
 	if (iMListSize>0) CloseSWCCGData();
 
-	if ((fh=fopen(DATAFILEN,"rb"))==NULL)
+
+	sprintf(fn,"%s\\%s",szApp,DATAFILEN);
+	if ((fh=fopen(fn,"rb"))==NULL)
 		return CANT_OPEN_DATA;
 
 	iDataSize = FileLength(fh);
@@ -216,11 +176,23 @@ int	OpenSWCCGData(HWND hwndSplash)
 			case 'i': masterlist[i].icons[CSET] = ICO_2P; break;
 			case 'U': masterlist[i].icons[CSET] = ICO_ULTD; break;
 			case 'a': masterlist[i].icons[CSET] = ICO_ANH; break;
+			case 'A': masterlist[i].icons[CSET] = ICO_ANHUL; break;
 			case 'h': masterlist[i].icons[CSET] = ICO_HOTH; break;
+			case 'H': masterlist[i].icons[CSET] = ICO_HOTHUL; break;
 			case 'E': masterlist[i].icons[CSET] = ICO_2P; break; // ESB 2P
 			case 'd': masterlist[i].icons[CSET] = ICO_DAGOBAH; break;
 			case 'c': masterlist[i].icons[CSET] = ICO_BESPIN; break;
 			case 'J': masterlist[i].icons[CSET] = ICO_JABBA; break;
+			case 'n': masterlist[i].icons[CSET] = ICO_ANTHOLOGY; break;
+			case 's': masterlist[i].icons[CSET] = ICO_SE; break;
+			case 'P': masterlist[i].icons[CSET] = ICO_EPP; break;
+			case 'r': masterlist[i].icons[CSET] = ICO_RL; break;
+			case 'j': masterlist[i].icons[CSET] = ICO_JEDIPACK; break;
+			case 'S': masterlist[i].icons[CSET] = ICO_OTSD; break;
+			case 'e': masterlist[i].icons[CSET] = ICO_ENDOR; break;
+			case 'W': masterlist[i].icons[CSET] = ICO_ENDORUL; break;
+			case 'z': masterlist[i].icons[CSET] = ICO_DEATHSTAR; break;
+			case 'R': masterlist[i].icons[CSET] = ICO_DEATHSTARUL; break;
 			default:  masterlist[i].icons[CSET] = ICO_RL; break;
 		}
 
@@ -262,10 +234,18 @@ int	OpenSWCCGData(HWND hwndSplash)
 		{
 			case 'L':
 				// all locations have force icons
-				masterlist[i].icons[CEXTRA1]=
-					masterlist[i].attr[ATT_RFORCE]-'0'+ICO_RFORCE0;
-				masterlist[i].icons[CEXTRA2]=
-					masterlist[i].attr[ATT_IFORCE]-'0'+ICO_IFORCE0;
+				switch (masterlist[i].attr[ATT_RFORCE]) {
+				case '1': masterlist[i].icons[CEXTRA1]=ICO_RFORCE1; break;
+				case '2': masterlist[i].icons[CEXTRA1]=ICO_RFORCE2; break;
+				case '3': masterlist[i].icons[CEXTRA1]=ICO_RFORCE3; break;
+				default: masterlist[i].icons[CEXTRA1]=ICO_RFORCE0; break;
+				}
+				switch (masterlist[i].attr[ATT_IFORCE]) {
+				case '1': masterlist[i].icons[CEXTRA2]=ICO_IFORCE1; break;
+				case '2': masterlist[i].icons[CEXTRA2]=ICO_IFORCE2; break;
+				case '3': masterlist[i].icons[CEXTRA2]=ICO_IFORCE3; break;
+				default: masterlist[i].icons[CEXTRA2]=ICO_IFORCE0; break;
+				}
 				// swap force icons if this is a Dark card
 				if (masterlist[i].attr[ATT_SIDE]=='d')
 				{
@@ -318,6 +298,7 @@ int	OpenSWCCGData(HWND hwndSplash)
 					case 'L': masterlist[i].icons[CEXTRA3]=ICO_LEADER; break;
 					case 'S': masterlist[i].icons[CEXTRA3]=ICO_SPY; break;
 					case 'B': masterlist[i].icons[CEXTRA3]=ICO_BOUNTY; break;
+					case 'p': masterlist[i].icons[CEXTRA3]=ICO_PERMWEAPON; break;
 				}
 
 				switch (masterlist[i].attr[ATT_SUBTYPE])
@@ -383,7 +364,7 @@ int	OpenSWCCGData(HWND hwndSplash)
 				switch (masterlist[i].attr[ATT_SUBTYPE])
 				{
 					case 'C':
-						if (masterlist[i].attr[ATT_SIDE]=='L')
+						if (masterlist[i].attr[ATT_SIDE]=='l')
 							masterlist[i].icons[CEXTRA3]=ICO_REBEL;
 						else masterlist[i].icons[CEXTRA3]=ICO_IMP;
 						break;
@@ -440,7 +421,8 @@ void ResetSWCCGData(void)
 	CloseSWCCGData();
 	OpenSWCCGData(NULL);
 }
-		
+
+/* <<Up for deletion>>		
 void ImportData(void)
 {
 	FILE *fin,*fout;
@@ -550,7 +532,7 @@ void CreateOldData(void)
 	fclose(fhLgt);
 	fclose(fhDrk);
 
-}
+}*/
 
 int cardvalid(int idx)
 {
@@ -624,7 +606,7 @@ int IncludeCList(int att,int c)
 // of cards excluded.
 int ExcludeCList(int att,int c,BOOL bLeave)
 {
-	int i,cKilled;
+	int i=0,cKilled=0;
 
 	for (i=0,cKilled=0;i<iCListSize;i++)
 	{
@@ -663,9 +645,12 @@ BOOL getsets(HWND hwnd)
 		fprintf(fh,"hHoth\n");
 		fprintf(fh,"HUnlimited Hoth\n");
 		fprintf(fh,"dDagobah\n");
+		fprintf(fh,"DUnlimited Dagobah\n");
 		fprintf(fh,"cCloud City\n");
+		fprintf(fh,"CUnlimited Cloud City\n");
 		fprintf(fh,"JJabba's Palace\n");
-		fprintf(fh,"1First Anthology (Unlimited SE)\n");
+		fprintf(fh,"LUnlimited Jabba's Palace\n");
+		fprintf(fh,"nAnthology\n");
 		fprintf(fh,"sSpecial Edition\n");
 		fprintf(fh,"PEnhanced Premiere Pack\n");
 		fprintf(fh,"iPremiere 2-Player\n");
@@ -674,7 +659,9 @@ BOOL getsets(HWND hwnd)
 		fprintf(fh,"jJedi Pack\n");
 		fprintf(fh,"SOfficial Sealed Deck\n");
 		fprintf(fh,"eEndor\n");
-		fprintf(fh,"DDeath Star\n");
+		fprintf(fh,"WUnlimited Endor\n");
+		fprintf(fh,"zDeath Star\n");
+		fprintf(fh,"RUnlimited Death Star\n");
 		fprintf(fh,"\n");
 		fclose(fh);
 		if ((fh=fopen(SETSFILEN,"r"))==NULL)
@@ -700,9 +687,40 @@ BOOL getsets(HWND hwnd)
 	return TRUE;
 }
 
+#define LoadHandle(a,b) \
+sprintf(file,"%s\\%s",szApp,a);\
+hImageLists[b] =\
+ImageList_LoadImage(NULL,file,16,0,CLR_NONE,IMAGE_BITMAP,LR_LOADFROMFILE|\
+														 LR_LOADTRANSPARENT|\
+														 LR_CREATEDIBSECTION);
+
 void DefineICO(HANDLE hInst)
 {
-	hIcons[0]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_BLANK));
+	char file[_MAX_PATH];
+	
+	//hImageLists init.
+	//IGEN_*
+	LoadHandle("generic.bmp",IGEN_HANDLE);
+	//IDST_*
+	LoadHandle("destiny.bmp",IDST_HANDLE);
+	//ITYP_*
+	LoadHandle("types.bmp",ITYP_HANDLE);
+	//IICO_*
+	LoadHandle("icons.bmp",IICO_HANDLE);
+	//IRAR_*
+	LoadHandle("rarity.bmp",IRAR_HANDLE);
+	//ISET_*
+	LoadHandle("sets.bmp",ISET_HANDLE);
+	//IFOR_*
+	LoadHandle("force.bmp",IFRC_HANDLE);
+	//IDEP_*
+	LoadHandle("deploy.bmp",IDEP_HANDLE);
+	//IFOR_*
+	LoadHandle("forfeit.bmp",IFIT_HANDLE);
+	//IBAK_*
+	LoadHandle("backs.bmp",IBAK_HANDLE);
+
+/*	hIcons[0]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_BLANK));
 	hIcons[1]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_BLANK));
 	hIcons[2]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_DEST0));
 	hIcons[3]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_DEST1));
@@ -808,6 +826,20 @@ void DefineICO(HANDLE hInst)
 	hIcons[101]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_OBJECTIVE));
 
 	hIcons[102]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_FIXED));
+
+	hIcons[103]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_PERMWEAPON));
+	hIcons[104]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_ANHUL));
+	hIcons[105]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_HOTHUL));
+	hIcons[106]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_SE));
+	hIcons[107]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_ANTHOLOGY));
+	hIcons[108]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_EPP));
+	hIcons[109]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_JEDIPACK));
+	hIcons[110]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_OTSD));
+	hIcons[111]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_ENDOR));
+	hIcons[112]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_ENDORUL));
+	hIcons[113]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_DEATHSTAR));
+	hIcons[114]=LoadBitmap(hInst,MAKEINTRESOURCE(IDB_DEATHSTARUL));
+*/	
 	
 	hBr[BR_RED] = CreateSolidBrush(RGB_RED);
 	hBr[BR_BLACK] = CreateSolidBrush(RGB_BLACK);
@@ -828,7 +860,8 @@ void DeleteICO(void)
 	DeleteObject(hDarkBrush);
 	DeleteObject((HGDIOBJ)hBlankRow);
 	for (i=0;i<8;i++) DeleteObject((HGDIOBJ)hBr[i]);
-	for (i=0;i<NUMICONS;i++) DeleteObject((HGDIOBJ)hIcons[i]);
+	//for (i=0;i<ICO_MAX;i++) DeleteObject((HGDIOBJ)hIcons[i]);
+	for (i=0;i<6;i++) ImageList_Destroy(hImageLists[i]);
 }
 
 void DrawBitmap(HDC hdc,HBITMAP hBitmap,int xStart,int yStart)
@@ -863,6 +896,7 @@ void DrawBackBitmap(HDC hdc,HBITMAP hBitmap,int xStart,int yStart)
 	DeleteDC(hdcMem);
 }
 
+/* <<Up for deletion>>
 void DrawCardIcons(HDC hdc,int card,int xStart,int yStart)
 {
 	HDC		hdcMemIco[7];
@@ -892,7 +926,7 @@ void DrawCardIcons(HDC hdc,int card,int xStart,int yStart)
 	DeleteDC(hdcMemAll);
 	for (i=0;i<7;i++)
 		DeleteDC(hdcMemIco[i]);
-}
+}*/
 
 BOOL ToggleMenu(HMENU hMenu,UINT id,BOOL *state)
 {
@@ -1059,11 +1093,18 @@ void sortclist(void)
 
 void newsort(char *sort)
 {
-	int i,j,k;
-	int tmpRank[MAXLIST];	// temporary list of ranks
-	char key[MAXLIST][MAXSORT+80];		// sort sequence string
+	int i=0,j=0,k=0;
+	//int tmpRank[MAXLIKELY];	// temporary list of ranks
+	int *tmpRank = (int*)malloc((MAXLIST+10)*sizeof(int));
+	//char key[MAXLIKELY][MAXSORT+80];		// sort sequence string
+	char **key; 
+
 	char szKey[25];
 	HCURSOR hCursor;
+
+	key = (char**)malloc((MAXLIST+10)*sizeof(char*));
+	for (i = 0;i<MAXLIST+9;i++)
+		key[i] = (char*)malloc(MAXSORT+80);
 
 	if (iMListSize>1)
 	{
@@ -1104,7 +1145,8 @@ void newsort(char *sort)
 	SetCursor(hCursor);
 
 	}
-
+	free(key);
+	free(tmpRank);
 }
 
 void calcRange(char *szBuf,int att)
@@ -1541,8 +1583,11 @@ BOOL LoadPriceGuide(void)
 	int  cSide,cSet;
 	int	 idx;
 	FILE *fh;
+	char szFn[_MAX_PATH];
+	
+	sprintf(szFn,"%s\\%s",szApp,PRICEFILEN);
 
-	if ((fh=fopen(PRICEFILEN,"r"))==NULL)
+	if ((fh=fopen(szFn,"r"))==NULL)
 	{
 		if ((fh=fopen("SWCCG Price Guide.dm","w"))!=NULL)
 		{

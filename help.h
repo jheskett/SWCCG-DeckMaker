@@ -10,39 +10,32 @@ any time.  By checking 'Keep used cards', only cards \
 with zero quantity will be excluded.  The rest will remain in the \
 list.  If 'Keep used cards' is unchecked, then ALL cards of the selected group(s) \
 will be removed from the list, regardless of quantity. (When the removed \
-cards are Included later, they will retain their quantity; however, when \
-you save your work, all quantities in the excluded cards are lost. So be \
-careful not to accidentally delete half your inventory.  There's no way \
-to get the unsaved cards' quantities back.)"
+cards are Included later, they will retain their quantity)"
 
 #define HELP_INCLUDE "If you have Excluded cards from view, you can \
 Include them back.  (ie, if you've Excluded Unlimited and you want to \
 see Unlimiteds in the list again, you can Include them back)  Note that \
 when the cards are Included back they retain their previous quantity."
 
-#define HELP_NOSETS "The file swccgdm.set contains the codes used for\r\
+#define HELP_NOSETS "The file 'SWCCG Sets.dm' contains the codes used for\r\
 each set.  The program can't continue without them.\r\
-Would you like to create the default swccgdm.set file?\r\
-(Note: some codes may be lost)"
+Would you like to create the default Sets file?"
 
 #define HELP_SORT "Through the Custom Sort, you have some limited \
 control over the order the cards are listed.  The first sort you pick \
 will be the primary sort, the second will be the secondary sort, etc. \
-You can't change the order within a sort.  (ie, R1's will always list \
-before R2's in a Rarity sort)  If a sort you define comes out nothing \
+You can't change the order within a sort.  (ie, Rares will always list \
+before Uncommons in a Rarity sort)  If a sort you define comes out nothing \
 like you expected, check to make sure that you have narrowed it down \
 enough.  For instance, if you wanted to sort all cards by type and \
-the subtypes(ie, rebels, aliends, droids separate), 'Type' must list \
+the subtypes(ie, rebels, aliens, droids separate), 'Type' must list \
 before 'Subtype'.  Another example: If you pick 'Deploy' as your only sort, \
 then all non-deploy cards(interrupts, effects, etc) will list before \
 deployable cards, possibly creating undesirable results.  In this case, you \
 should have a 'Type' sort occur before the 'Deploy' sort.  Once all cards \
 are sorted by the list you provide, the cards are sorted by Name last.  If \
 you want to sort the cards by Name only, you can leave the list empty. \
-NOTE: the 'by Sets Also' and 'by Sides Also' menu items will also affect \
-the custom sort.  (If you have a type/set/subtype order, and 'by Sets Also' \
-is turned on, then the cards will sort by set/type/set/subtype.  Which is \
-slightly different.)  Also, the menu item 'by Custom Sort' must be checked \
+The menu item 'by Custom Sort' must be checked \
 in order to view the sort.  This is automatically selected when you define \
 a new custom sort.  If you then go to another sort(ie, 'by Name') you can \
 just hit 'by Custom Sort' to return to the defined sort.  The current Custom \
@@ -50,13 +43,13 @@ Sort will be remembered even between sessions."
 
 #define HELP_EDITCARD "WARNING: ANY CHANGES YOU MAKE TO THE CARDS ARE \
 PERMANENT! THERE IS NO WAY TO UNDO ANY CHANGES UNLESS *YOU* FIND AN \
-ORIGINAL COPY OF THE SWCCGDM.DAT DATA FILE! EDIT THE CARD AT YOUR OWN \
+ORIGINAL COPY OF THE SWCCGDM.DM DATA FILE! EDIT THE CARD AT YOUR OWN \
 RISK! YOU ARE URGED TO HIT CANCEL NOW AND AVERT DISASTER! \
 THE AUTHOR OF THIS PROGRAM IS IN NO WAY RESPONSIBLE \
-FOR LOSS OF DATA OR EXPLAINING THE DETAILS OF THE ATTRIBUTES! \
-THIS 'FEATURE' IS A COURTESY AND IF THE AUTHOR GETS ANY \
-COMPLAINTS OR QUESTIONS ABOUT IT, THIS FEATURE WILL BE \
-REMOVED FROM ALL FUTURE VERSIONS OF THE DECKMAKER!!! YOU'RE \
+FOR LOSS OF DATA OR EXPLAINING THE DETAILS OF THE ATTRIBUTES! THE \
+ABILITY TO EDIT CARDS IS HERE AS A COURTESY! IT'S NOT YOUR RIGHT TO \
+ALTER THE DATA AT WILL, IT'S A PRIVILEDGE THAT CAN BE TAKEN AWAY IF YOU \
+HARRASS THE AUTHOR ABOUT IT. :) YOU'RE \
 ON YOUR OWN! AGAIN, TO SAVE EVERYONE GRIEF AND HARDSHIP, PLEASE \
 HIT CANCEL IF YOU DON'T KNOW EXACTLY WHAT YOU'RE DOING OR YOU \
 AREN'T WILLING TO FACE THE DIRE CONSEQUENCES!!!! MOST OF ALL: \
@@ -116,7 +109,27 @@ card name. If you're changing many card values, you'll probably want to \
 mention the source and the date of the source. To do this, check the box \
 marked 'Edit Source'. IMPORTANT: If 'Edit Source' is unchecked when you hit \
 OK, then the new source information won't be saved.\r\n\r\n\
-To load a new price guide, copy the new 'SWCCG Price Guide.dat' file over \
+To load a new price guide, copy the new 'SWCCG Price Guide.dm' file over \
 the old one. The next time you run the DeckMaker, all the new prices will be \
 used."
+
+#define HELP_FIND "Enter in the box provided any combination of words \
+contained in the card's lore, game text or name (depending on which of these \
+fields is selected).  The results will be displayed in the stats window, \
+where you can browse through them.  The searches are not case sensitive \
+and any words preceded with a '-' will be excluded from the search.  For an \
+exact phrase, surround the phrase with (\")s."
+
+#define HELP_MASSENTRY "For various reasons, you may have a need to adjust all \
+cards visible by a fixed amount. Here, you can enter which side to affect, \
+what rarities, and what sets.  Changes are ONLY made to cards in the visible \
+list. (ie, if white-bordered cards are combined, or one side is not shown, or \
+a group of cards are excluded, those 'hidden' cards are not adjusted.) After \
+choosing which side(s) to affect, the rarity level(s), and the set(s), enter a \
+quantity to adjust.  This quantity is ADDED to the visible cards.  If you enter \
+a negative number, this quantity is REMOVED from the visible cards.  (If you \
+plan to remove cards, it's highly recommended to turn Combine White Border OFF \
+unless you know what you're doing.)  All changes are permanent and cannot be \
+undone, so you might want to save a backup of your deck before making mass \
+card adjustments."
 

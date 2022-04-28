@@ -1,4 +1,4 @@
-// Star Wars CCG DeckMaker 3.0
+// Star Wars CCG DeckMaker 3.3
 // for Windows 95
 
 // started July 13, 1996
@@ -11,8 +11,8 @@
 #include <math.h>
 
 #include "resource.h"
-#include "SWDeck.h"
 #include "attributes.h"
+#include "SWDeck.h"
 #include "help.h"
 #include "ezfont.h"
 #include "SWStats.h"
@@ -24,6 +24,8 @@
 
 #define WMU_CHANGE_FONT 1L
 #define WMU_FOCUS_NOTES 2L
+
+int MAXLIST = 10000;
 
 LRESULT CALLBACK WndProc(HWND,UINT,WPARAM,LPARAM);
 LRESULT CALLBACK InfoWndProc(HWND,UINT,WPARAM,LPARAM);
@@ -48,7 +50,7 @@ BOOL	CALLBACK BrainiacDlgProc(HWND,UINT,WPARAM,LPARAM);
 HWND	hwndInfo;
 
 HANDLE	hInst;
-char	*szAppName= "DeckMaker 3.2";
+char	*szAppName = "DeckMaker 3.5";
 
 char	pHelpText[10000];	// buffer for storing context-sensitive help
 
@@ -80,9 +82,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	int			i;
 	HDC			hdc;
 	int			cxWindow,cyWindow,xWindow,yWindow;
-	char		szTmp[_MAX_PATH];
 
-	DefineICO(hInstance);	// load all the images first off
 
 	wndclass.cbSize			= sizeof(wndclass);
 	wndclass.style			= CS_HREDRAW | CS_VREDRAW;
@@ -121,12 +121,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	InitCommonControls();
 
 	// before we do anything, get the current directory and save it for future use
-	_getcwd(szTmp,_MAX_PATH);
-	sprintf(szIni,"%s\\SWCCG DeckMaker.ini",szTmp);
+	_getcwd(szApp,_MAX_PATH);
+	sprintf(szIni,"%s\\SWCCG DeckMaker.ini",szApp);
 
-	hwndSplash = CreateDialog(hInst,MAKEINTRESOURCE(IDD_SPLASHDLG),NULL,(DLGPROC)SplashDlgProc);
+//	GetMenuProfile(hMenu); // overwrite any of the above
+//								   // if profile is different
+//	menu.bUnlimited=FALSE;
+	getbool("View","NoUnlimited",&menu.bNoUnlimited);
+
+	hwndSplash = CreateDialog(hInst,MAKEINTRESOURCE(IDD_SPLASHDLG),NULL,SplashDlgProc);
 
 	i = OpenSWCCGData(hwndSplash);
+
+	DefineICO(hInstance);	// load all the images first off
 
 	if (i>ALL_OK) DestroyWindow(hwndSplash);
 
@@ -193,7 +200,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	{
 
 		hDlgStats = CreateDialog(hInst,MAKEINTRESOURCE(IDD_STATSDLG),
-								hwnd,(DLGPROC)StatsDlgProc);
+								hwnd,StatsDlgProc);
 
 		DestroyWindow(hwndSplash);
 
@@ -220,6 +227,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		CloseSWCCGData();
 
 	}
+
+	free(masterlist);
+	free(cardlist);
+	free(decklist);
 
 	DeleteICO();			// delete images loaded at start of program
 	
@@ -333,6 +344,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,WPARAM wParam,LPARAM lParam)
 	UINT				ui;
 	int					cxWindow,cyWindow,xWindow,yWindow;
 
+/*	HPALETTE			hPal;
+	HPALETTE			hOldPal;
+	LPLOGPALETTE		lplogpal;
+	HBITMAP				hTmpBitmap;
+	int					nColors;
+	RGBQUAD				*lpRGB;
+	DIBSECTION			ds;*/
+
+
 	switch (iMsg)
 	{
 		case WM_COMMAND:
@@ -340,7 +360,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,WPARAM wParam,LPARAM lParam)
 			{
 				case ID__ENTERQTY:
 					j = cardlist[iSel].deck;
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_QTYDLG),hwnd,(DLGPROC)QtyDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_QTYDLG),hwnd,QtyDlgProc);
 					cardlist[iSel].wb += (cardlist[iSel].deck-j);
 					cardlist[iSel].wb = max(0,min(cardlist[iSel].wb,99999));
 					return 0;
@@ -353,14 +373,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,WPARAM wParam,LPARAM lParam)
 					return 0;
 
 				case ID__EDITPRICE:
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_PRICEDLG),hwnd,(DLGPROC)PriceDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_PRICEDLG),hwnd,PriceDlgProc);
 					updatestats(hDlgStats);
 					updateinfo(hwnd);
 					return 0;
 
+/* <<Up for deletion>>
 				case ID__EDITCARD:
 					iBuf=cardlist[iSel].idx;
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_EDITDLG),hwnd,(DLGPROC)EditDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_EDITDLG),hwnd,EditDlgProc);
 					if (iBuf!=-1) SendMessage(hwnd,WM_COMMAND,(WPARAM)ID_FILE_NEW_ALL,0);
 					return 0;
 
@@ -385,7 +406,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,WPARAM wParam,LPARAM lParam)
 					InvalidateRect(hwnd,NULL,TRUE);
 
 					return 0;
-
+*/
 				case ID_SORT_BYSIDEFIRST:
 					ToggleMenu(hMenu,ID_SORT_BYSIDEFIRST,&menu.bSortSides);
 					SendMessage(hwnd,WM_COMMAND,uSortOrder,0);
@@ -432,7 +453,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg,WPARAM wParam,LPARAM lParam)
 					return 0;
 
 				case ID_SORT_DEFINECUSTOM:
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_SORTDLG),hwnd,(DLGPROC)SortDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_SORTDLG),hwnd,SortDlgProc);
 					if (iBuf) SendMessage(hwnd,WM_COMMAND,ID_SORT_BYCUSTOM,0);
 					return 0;
 
@@ -499,7 +520,7 @@ To update now, exit and run the DeckMaker again.",szAppName,MB_OK);
 					ShowCursor(TRUE);								// make the pointer the "hourglass"
 
 					IncludeCList(ATT_SIDE,'*');
-					ExcludeCList(ATT_SIDE,'L',FALSE);
+					ExcludeCList(ATT_SIDE,'l',FALSE);
 					if (menu.bCombineWB) LoadCombineWB();
 					UpdateRange(hwnd);
 					updatestats(hDlgStats);
@@ -580,12 +601,12 @@ To update now, exit and run the DeckMaker again.",szAppName,MB_OK);
 					return 0;
 
 				case ID_VIEW_FIND:
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_FINDDLG),hwnd,(DLGPROC)FindDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_FINDDLG),hwnd,FindDlgProc);
 					return 0;
 
 				case ID_NAV_JUMP:
 					iUndoSel=iSel;
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_JUMPDLG),hwnd,(DLGPROC)JumpDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_JUMPDLG),hwnd,JumpDlgProc);
 					return 0;
 
 				case ID_RANGES_LMH:
@@ -699,31 +720,31 @@ To update now, exit and run the DeckMaker again.",szAppName,MB_OK|MB_ICONEXCLAMA
 
 				case ID_TOOLS_CHANGESET:
 					iOrderMode=ORDERSETS;
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_ORDERDLG),hwnd,(DLGPROC)OrderDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_ORDERDLG),hwnd,OrderDlgProc);
 					if (iOrderMode==ORDERSETS) MessageBox(hwnd,"The set order will update the next time this program is run.\r\n\
 To change it now, exit and run the DeckMaker again.",szAppName,MB_OK|MB_ICONEXCLAMATION);
 					return 0;
 
 				case ID_TOOLS_CHANGETYPE:
 					iOrderMode=ORDERTYPE;
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_ORDERDLG),hwnd,(DLGPROC)OrderDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_ORDERDLG),hwnd,OrderDlgProc);
 					if (iOrderMode==ORDERTYPE) MessageBox(hwnd,"The type order will update the next time this program is run.\r\n\
 To change it now, exit and run the DeckMaker again.",szAppName,MB_OK|MB_ICONEXCLAMATION);
 					return 0;
 
 				case ID_TOOLS_BRAINIAC:
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_BRAINIACDLG),hwnd,(DLGPROC)BrainiacDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_BRAINIACDLG),hwnd,BrainiacDlgProc);
 					return 0;
 
 				case ID_TOOLS_FILLRARITIES:
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_MASSENTRYDLG),hwnd,(DLGPROC)MassEntryDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_MASSENTRYDLG),hwnd,MassEntryDlgProc);
 					return 0;
 
 				case ID_TOOLS_CREATENEED:
 					if (bNeedSave&&IDCANCEL==
 							AskAboutSave(hwnd,szTitleName))
 						return 0;
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_WANTDLG),hwnd,(DLGPROC)WantDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_WANTDLG),hwnd,WantDlgProc);
 					if (bNeedSave)
 					{
 						szFileName[0]='\0';
@@ -743,18 +764,21 @@ To change it now, exit and run the DeckMaker again.",szAppName,MB_OK|MB_ICONEXCL
 					DoCaption(hwnd,szTitleName);
 					bNeedSave=FALSE;
 					ResetSWCCGData();
+					//IncludeCList(ATT_SIDE,'d');
+					//IncludeCList(ATT_SIDE,'l');
+					//msortcardlist();
 					SetWindowText(GetDlgItem(hDlgStats,IDC_STATSNOTES),"");
-					menu.bExcludeLight=FALSE;
-					menu.bExcludeDark=FALSE;
+					menu.bExcludeLight=TRUE;
+					menu.bExcludeDark=TRUE;
 					switch (wParam)
 					{
 						case ID_FILE_NEW_LIGHT:
 							ExcludeCList(ATT_SIDE,'d',FALSE);
-							menu.bExcludeDark=TRUE;
+							menu.bExcludeLight=FALSE;
 							break;
 						case ID_FILE_NEW_DARK:
 							ExcludeCList(ATT_SIDE,'l',FALSE);
-							menu.bExcludeLight=TRUE;
+							menu.bExcludeDark=FALSE;
 							break;
 					}
 					if (menu.bCombineWB) CombineWB();
@@ -856,13 +880,13 @@ To change it now, exit and run the DeckMaker again.",szAppName,MB_OK|MB_ICONEXCL
 					return 0;
 
 				case ID_FILE_PRNT:
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_PRINTDLG),hwnd,(DLGPROC)PrintDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_PRINTDLG),hwnd,PrintDlgProc);
 					return 0;
 
 				case ID_FILE_EXIT:
 					SendMessage(hwnd,WM_CLOSE,0,0);
 					return 0;
-
+/* <<Up for deletion>>
 				case ID_DATAFILES_EXPORT:
 					ExportData();
 					return 0;
@@ -874,23 +898,23 @@ To change it now, exit and run the DeckMaker again.",szAppName,MB_OK|MB_ICONEXCL
 				case ID_DATAFILES_CREATE:
 					CreateOldData();
 					return 0;
-
+*/
 				case ID_VIEW_INCLUDE:
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_INCLUDEDLG),hwnd,(DLGPROC)IncludeDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_INCLUDEDLG),hwnd,IncludeDlgProc);
 					UpdateRange(hwnd);
 					updatestats(hDlgStats);
 					InvalidateRect(hwnd,NULL,TRUE);
 					return 0;
 					
 				case ID_VIEW_EXCLUDE:
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_EXCLUDEDLG),hwnd,(DLGPROC)ExcludeDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_EXCLUDEDLG),hwnd,ExcludeDlgProc);
 					UpdateRange(hwnd);
 					updatestats(hDlgStats);
 					InvalidateRect(hwnd,NULL,TRUE);
 					return 0;
 
 				case ID_HELP_ABOUT:
-					DialogBox(hInstance,MAKEINTRESOURCE(IDD_ABOUTDLG),hwnd,(DLGPROC)AboutDlgProc);
+					DialogBox(hInstance,MAKEINTRESOURCE(IDD_ABOUTDLG),hwnd,AboutDlgProc);
 					return 0;
 				case ID_HELP_ANHRULES:
 					WinHelp(hwnd,"SWCCG DECKMAKER.hlp",HELP_CONTENTS,0);
@@ -1004,7 +1028,7 @@ To change it now, exit and run the DeckMaker again.",szAppName,MB_OK|MB_ICONEXCL
 //			{
 //				GetFileTitle(szFileName,szTitleName,
 //					sizeof(szTitlename));
-			DoCaption(hwnd,szTitleName);
+			DoCaption(hwnd,szFileName);
 
 			SendMessage(hwnd,WM_COMMAND,uSortOrder,0);
 			if (menu.bCombineWB) CombineWB();
@@ -1287,7 +1311,42 @@ To change it now, exit and run the DeckMaker again.",szAppName,MB_OK|MB_ICONEXCL
 				updateinfo(hwnd);
 			}
 			return 0;
-			
+
+/*		case WM_QUERYNEWPALETTE:
+			hdc = CreateCompatibleDC(GetDC(hwnd));
+			if (hPalBmp != NULL) {
+				//GetDIBits(hdc,hPalBmp,0,0,NULL,&bi,DIB_RGB_COLORS);
+				if ( GetObject(hPalBmp,sizeof(ds),&ds) == 0) return 0;
+				hTmpBitmap = SelectObject(hdc,hPalBmp);
+				nColors = ds.dsBmih.biClrUsed?ds.dsBmih.biClrUsed:1<<ds.dsBm.bmBitsPixel;
+
+				if ( GetDeviceCaps(hdc,RASTERCAPS)& RC_PALETTE) {
+					if (nColors >256)
+						hPal = CreateHalftonePalette(hdc);
+					else {
+						lpRGB = malloc(sizeof(RGBQUAD)*nColors);
+						GetDIBColorTable(hdc,0,nColors,lpRGB);
+
+						lplogpal = malloc(sizeof(LOGPALETTE)+256*sizeof(PALETTEENTRY));
+						lplogpal->palVersion = 0x300;
+						lplogpal->palNumEntries = 256;
+						for (i=0;i<256;i++) {
+							lplogpal->palPalEntry[i].peRed = lpRGB[i].rgbRed;
+							lplogpal->palPalEntry[i].peGreen = lpRGB[i].rgbGreen;
+							lplogpal->palPalEntry[i].peBlue = lpRGB[i].rgbBlue;
+						}
+						hPal = CreatePalette(lplogpal);
+						free(lpRGB);
+						free(lplogpal);
+					}
+				}
+				hOldPal = SelectPalette(hdc,hPal,TRUE);
+				RealizePalette(hdc);
+				SelectPalette(hdc,hOldPal,TRUE);
+				SelectObject(hdc,hTmpBitmap);
+			}
+			return 0;*/
+
 		case WM_PAINT:
 			hdc = BeginPaint(hwnd,&ps);
 
@@ -1314,40 +1373,40 @@ To change it now, exit and run the DeckMaker again.",szAppName,MB_OK|MB_ICONEXCL
 				if (menu.bExtraIcons)
 				{
 					if (masterlist[cardlist[i].idx].icons[CEXTRA3])
-						DrawBitmap(hdc,hIcons[masterlist[cardlist[i].idx].icons[CEXTRA3]],cx,cy);
+						ILDrawBitmap(hdc,masterlist[cardlist[i].idx].icons[CEXTRA3],cx,cy);
 					cx += 17;
 					if (masterlist[cardlist[i].idx].icons[CEXTRA2])
-						DrawBitmap(hdc,hIcons[masterlist[cardlist[i].idx].icons[CEXTRA2]],cx,cy);
+						ILDrawBitmap(hdc,masterlist[cardlist[i].idx].icons[CEXTRA2],cx,cy);
 					cx += 17;
 					if (masterlist[cardlist[i].idx].icons[CEXTRA1])
-						DrawBitmap(hdc,hIcons[masterlist[cardlist[i].idx].icons[CEXTRA1]],cx,cy);
+						ILDrawBitmap(hdc,masterlist[cardlist[i].idx].icons[CEXTRA1],cx,cy);
 					cx += 17;
 				}
 				if (menu.bSetIcons)
 				{
 					if (masterlist[cardlist[i].idx].icons[CSET])
-						DrawBitmap(hdc,hIcons[masterlist[cardlist[i].idx].icons[CSET]],cx,cy);
+						ILDrawBitmap(hdc,masterlist[cardlist[i].idx].icons[CSET],cx,cy);
 					cx += 17;
 				}
 				if (menu.bRareIcons)
 				{
 					if (masterlist[cardlist[i].idx].icons[CRARITY])
-						DrawBitmap(hdc,hIcons[masterlist[cardlist[i].idx].icons[CRARITY]],cx,cy);
+						ILDrawBitmap(hdc,masterlist[cardlist[i].idx].icons[CRARITY],cx,cy);
 					cx += 17;
 				}
 				if (menu.bDestIcons)
 				{
 					if (masterlist[cardlist[i].idx].icons[CDEST])
-						DrawBitmap(hdc,hIcons[masterlist[cardlist[i].idx].icons[CDEST]],cx,cy);
+						ILDrawBitmap(hdc,masterlist[cardlist[i].idx].icons[CDEST],cx,cy);
 					cx += 17;
 					if (masterlist[cardlist[i].idx].icons[CDEST2])
-						DrawBitmap(hdc,hIcons[masterlist[cardlist[i].idx].icons[CDEST2]],cx,cy);
+						ILDrawBitmap(hdc,masterlist[cardlist[i].idx].icons[CDEST2],cx,cy);
 					cx += 17;
 				}
 				if (menu.bTypeIcons)
 				{
 					if (masterlist[cardlist[i].idx].icons[CTYPE])
-						DrawBitmap(hdc,hIcons[masterlist[cardlist[i].idx].icons[CTYPE]],cx,cy);
+						ILDrawBitmap(hdc,masterlist[cardlist[i].idx].icons[CTYPE],cx,cy);
 					cx += 17;
 				}
 
@@ -1559,7 +1618,7 @@ BOOL CALLBACK ExcludeDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 
 				case IDHELP:
 					sprintf(pHelpText,HELP_EXCLUDE);
-					DialogBox(hInst,MAKEINTRESOURCE(IDD_HELPDLG),hDlg,(DLGPROC)HelpDlgProc);
+					DialogBox(hInst,MAKEINTRESOURCE(IDD_HELPDLG),hDlg,HelpDlgProc);
 					return TRUE;
 			}
 			break;
@@ -1625,14 +1684,13 @@ BOOL CALLBACK IncludeDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 
 				case IDHELP:
 					sprintf(pHelpText,HELP_INCLUDE);
-					DialogBox(hInst,MAKEINTRESOURCE(IDD_HELPDLG),hDlg,(DLGPROC)HelpDlgProc);
+					DialogBox(hInst,MAKEINTRESOURCE(IDD_HELPDLG),hDlg,HelpDlgProc);
 					return TRUE;
 			}
 			break;
 	}
 	return FALSE;
 }
-
 
 BOOL CALLBACK HelpDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 {
@@ -1653,6 +1711,7 @@ BOOL CALLBACK HelpDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 	return FALSE;
 }
 
+/* <<Up for deletion>>
 BOOL CALLBACK EditDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 {
 	FILE	*fh;
@@ -1678,7 +1737,7 @@ BOOL CALLBACK EditDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 
 				case IDHELP:
 					sprintf(pHelpText,HELP_EDITCARD);
-					DialogBox(hInst,MAKEINTRESOURCE(IDD_HELPDLG),hDlg,(DLGPROC)HelpDlgProc);
+					DialogBox(hInst,MAKEINTRESOURCE(IDD_HELPDLG),hDlg,HelpDlgProc);
 					return TRUE;
 
 				case IDOK:
@@ -1717,7 +1776,7 @@ BOOL CALLBACK EditDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 
 	}
 	return FALSE;
-}
+}*/
 
 BOOL CALLBACK SplashDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 {
@@ -1851,7 +1910,7 @@ BOOL CALLBACK SortDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 
 				case IDHELP:
 					sprintf(pHelpText,HELP_SORT);
-					DialogBox(hInst,MAKEINTRESOURCE(IDD_HELPDLG),hDlg,(DLGPROC)HelpDlgProc);
+					DialogBox(hInst,MAKEINTRESOURCE(IDD_HELPDLG),hDlg,HelpDlgProc);
 					return TRUE;
 
 			}
@@ -1860,6 +1919,7 @@ BOOL CALLBACK SortDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 	return FALSE;
 }
 
+/* <<Up for deletion>> */
 BOOL CALLBACK DeckDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 {
 	RECT	rect;
@@ -2032,32 +2092,32 @@ LRESULT CALLBACK InfoWndProc(HWND hwnd, UINT iMsg,WPARAM wParam,LPARAM lParam)
 			TextOut(hdc,rLore.left,0,szBuf,strlen(szBuf));
 			//(hdc,szBuf,strlen(szBuf),&rect,DT_VCENTER|DT_SINGLELINE);
 
-			if (masterlist[cardlist[iSel].idx].attr[ATT_SIDE]=='L')
-				DrawBackBitmap(hdc,hIcons[ICO_LSBACK],2,46);
+			if (masterlist[cardlist[iSel].idx].attr[ATT_SIDE]=='d')
+				ILDrawBitmap(hdc,ICO_LSBACK,2,46);
 			else
-				DrawBackBitmap(hdc,hIcons[ICO_DSBACK],2,46);
+				ILDrawBitmap(hdc,ICO_DSBACK,2,46);
 
 			i=masterlist[cardlist[iSel].idx].icons[CTYPE];
-			if (i) DrawBitmap(hdc,hIcons[i],2,2);
+			if (i) ILDrawBitmap(hdc,i,2,2);
 			if (masterlist[cardlist[iSel].idx].icons[CDEST2] != ICO_NONE) {
 				i=masterlist[cardlist[iSel].idx].icons[CDEST2];
-				if (i) DrawBitmap(hdc,hIcons[i],cxIClient-18,2);
+				if (i) ILDrawBitmap(hdc,i,cxIClient-18,2);
 				i=masterlist[cardlist[iSel].idx].icons[CDEST];
-				if (i) DrawBitmap(hdc,hIcons[i],cxIClient-36,2);
+				if (i) ILDrawBitmap(hdc,i,cxIClient-36,2);
 			} else {
 				i=masterlist[cardlist[iSel].idx].icons[CDEST];
-				if (i) DrawBitmap(hdc,hIcons[i],cxIClient-18,2);
+				if (i) ILDrawBitmap(hdc,i,cxIClient-18,2);
 			}
 			i=masterlist[cardlist[iSel].idx].icons[CRARITY];
-			if (i) DrawBitmap(hdc,hIcons[i],2,24);
+			if (i) ILDrawBitmap(hdc,i,2,24);
 			i=masterlist[cardlist[iSel].idx].icons[CSET];
-			if (i) DrawBitmap(hdc,hIcons[i],cxIClient-18,24);
+			if (i) ILDrawBitmap(hdc,i,cxIClient-18,24);
 			i=masterlist[cardlist[iSel].idx].icons[CEXTRA1];
-			if (i) DrawBitmap(hdc,hIcons[i],cxIClient-18,cyIClient-18);
+			if (i) ILDrawBitmap(hdc,i,cxIClient-18,cyIClient-18);
 			i=masterlist[cardlist[iSel].idx].icons[CEXTRA2];
-			if (i) DrawBitmap(hdc,hIcons[i],cxIClient-18,cyIClient-18-20);
+			if (i) ILDrawBitmap(hdc,i,cxIClient-18,cyIClient-18-20);
 			i=masterlist[cardlist[iSel].idx].icons[CEXTRA3];
-			if (i) DrawBitmap(hdc,hIcons[i],cxIClient-18,cyIClient-18-20-20);
+			if (i) ILDrawBitmap(hdc,i,cxIClient-18,cyIClient-18-20-20);
 
 			sprintf(szBuf,"New Set?");
 			for (i=0;i<MAXSETS;i++)
@@ -2091,11 +2151,11 @@ LRESULT CALLBACK InfoWndProc(HWND hwnd, UINT iMsg,WPARAM wParam,LPARAM lParam)
 						SetTextAlign(hdc,TA_CENTER);
 						TextOut(hdc,rLore.left+(rWidth(rLore))/2,rGT.top-cyChar,szBuf,strlen(szBuf));
 					}
-					DrawBitmap(hdc,hIcons[ICO_DEPLOY0+
-						digiticon(masterlist[cardlist[iSel].idx].attr[ATT_DEPLOY])],
+					ILDrawBitmap(hdc,MAKELONG(LOWORD(ICO_DEPLOY0),
+						digiticon(masterlist[cardlist[iSel].idx].attr[ATT_DEPLOY])),
 						2,cyIClient-18-20);
-					DrawBitmap(hdc,hIcons[ICO_FORFEIT0+
-						digiticon(masterlist[cardlist[iSel].idx].attr[ATT_FORFEIT])],
+					ILDrawBitmap(hdc,MAKELONG(LOWORD(ICO_FORFEIT0),
+						digiticon(masterlist[cardlist[iSel].idx].attr[ATT_FORFEIT])),
 						2,cyIClient-18);
 					switch (masterlist[cardlist[iSel].idx].attr[ATT_SUBTYPE])
 					{
@@ -2124,15 +2184,15 @@ LRESULT CALLBACK InfoWndProc(HWND hwnd, UINT iMsg,WPARAM wParam,LPARAM lParam)
 					TextOut(hdc,rLore.right,rGT.top-cyChar,szBuf,strlen(szBuf));
 					if (masterlist[cardlist[iSel].idx].attr[ATT_DEPLOY]=='?')
 					{
-						DrawBitmap(hdc,hIcons[ICO_DEPLOY15],2,cyIClient-18-20);
-						DrawBitmap(hdc,hIcons[ICO_FORFEIT15],2,cyIClient-18);
+						ILDrawBitmap(hdc,ICO_DEPLOY15,2,cyIClient-18-20);
+						ILDrawBitmap(hdc,ICO_FORFEIT15,2,cyIClient-18);
 					} else
 					{
-						DrawBitmap(hdc,hIcons[ICO_DEPLOY0+
-							digiticon(masterlist[cardlist[iSel].idx].attr[ATT_DEPLOY])],
+						ILDrawBitmap(hdc,MAKELONG(LOWORD(ICO_DEPLOY0),
+							digiticon(masterlist[cardlist[iSel].idx].attr[ATT_DEPLOY])),
 							2,cyIClient-18-20);
-						DrawBitmap(hdc,hIcons[ICO_FORFEIT0+
-							digiticon(masterlist[cardlist[iSel].idx].attr[ATT_FORFEIT])],
+						ILDrawBitmap(hdc,MAKELONG(LOWORD(ICO_FORFEIT0),
+							digiticon(masterlist[cardlist[iSel].idx].attr[ATT_FORFEIT])),
 							2,cyIClient-18);
 					}
 					switch (masterlist[cardlist[iSel].idx].attr[ATT_SUBTYPE])
@@ -2152,11 +2212,11 @@ LRESULT CALLBACK InfoWndProc(HWND hwnd, UINT iMsg,WPARAM wParam,LPARAM lParam)
 					sprintf(szBuf,"Defense %c",masterlist[cardlist[iSel].idx].attr[ATT_ABILITY]);
 					SetTextAlign(hdc,TA_CENTER);
 					TextOut(hdc,rLore.left+(rWidth(rLore))/2,rGT.top-cyChar,szBuf,strlen(szBuf));
-					DrawBitmap(hdc,hIcons[ICO_DEPLOY0+
-						digiticon(masterlist[cardlist[iSel].idx].attr[ATT_DEPLOY])],
+					ILDrawBitmap(hdc,MAKEWORD(LOWORD(ICO_DEPLOY0),
+						digiticon(masterlist[cardlist[iSel].idx].attr[ATT_DEPLOY])),
 						2,cyIClient-18-20);
-					DrawBitmap(hdc,hIcons[ICO_FORFEIT0+
-						digiticon(masterlist[cardlist[iSel].idx].attr[ATT_FORFEIT])],
+					ILDrawBitmap(hdc,MAKEWORD(LOWORD(ICO_FORFEIT0),
+						digiticon(masterlist[cardlist[iSel].idx].attr[ATT_FORFEIT])),
 						2,cyIClient-18);
 					break;
 
@@ -2255,11 +2315,11 @@ LRESULT CALLBACK InfoWndProc(HWND hwnd, UINT iMsg,WPARAM wParam,LPARAM lParam)
 						case 'S': sprintf(szBuf,"Starship Weapon"); break;
 						case 'R':
 							sprintf(szBuf,"Artillery Weapon");
-							DrawBitmap(hdc,hIcons[ICO_DEPLOY0+
-								digiticon(masterlist[cardlist[iSel].idx].attr[ATT_DEPLOY])],
+							ILDrawBitmap(hdc,ICO_DEPLOY0+
+								digiticon(masterlist[cardlist[iSel].idx].attr[ATT_DEPLOY]),
 								2,cyIClient-18-20);
-							DrawBitmap(hdc,hIcons[ICO_FORFEIT0+
-								digiticon(masterlist[cardlist[iSel].idx].attr[ATT_FORFEIT])],
+							ILDrawBitmap(hdc,ICO_FORFEIT0+
+								digiticon(masterlist[cardlist[iSel].idx].attr[ATT_FORFEIT]),
 								2,cyIClient-18);
 							break;
 						case 'V': sprintf(szBuf,"Vehicle Weapon"); break;
@@ -2278,11 +2338,11 @@ LRESULT CALLBACK InfoWndProc(HWND hwnd, UINT iMsg,WPARAM wParam,LPARAM lParam)
 					sprintf(szBuf,"Land %c",masterlist[cardlist[iSel].idx].attr[ATT_SPEED]);
 					SetTextAlign(hdc,TA_RIGHT);
 					TextOut(hdc,rLore.right,rGT.top-cyChar,szBuf,strlen(szBuf));
-					DrawBitmap(hdc,hIcons[ICO_DEPLOY0+
-						digiticon(masterlist[cardlist[iSel].idx].attr[ATT_DEPLOY])],
+					ILDrawBitmap(hdc,MAKELONG(LOWORD(ICO_DEPLOY0),
+						digiticon(masterlist[cardlist[iSel].idx].attr[ATT_DEPLOY])),
 						2,cyIClient-18-20);
-					DrawBitmap(hdc,hIcons[ICO_FORFEIT0+
-						digiticon(masterlist[cardlist[iSel].idx].attr[ATT_FORFEIT])],
+					ILDrawBitmap(hdc,MAKELONG(LOWORD(ICO_FORFEIT0),
+						digiticon(masterlist[cardlist[iSel].idx].attr[ATT_FORFEIT])),
 						2,cyIClient-18);
 					switch (masterlist[cardlist[iSel].idx].attr[ATT_SUBTYPE])
 					{
@@ -2368,7 +2428,7 @@ BOOL CALLBACK PriceDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 
 				case IDHELP:
 					sprintf(pHelpText,HELP_EDITVALUE);
-					DialogBox(hInst,MAKEINTRESOURCE(IDD_HELPDLG),hDlg,(DLGPROC)HelpDlgProc);
+					DialogBox(hInst,MAKEINTRESOURCE(IDD_HELPDLG),hDlg,HelpDlgProc);
 					return TRUE;
 
 				case IDC_PRICE_EDITSOURCE:
@@ -2789,7 +2849,7 @@ BOOL CALLBACK MassEntryDlgProc(HWND hDlg,UINT iMsg,WPARAM wParam,LPARAM lParam)
 					return TRUE;
 				case IDC_BUTTON_HELP:
 					sprintf(pHelpText,HELP_MASSENTRY);
-					DialogBox(hInst,MAKEINTRESOURCE(IDD_HELPDLG),hDlg,(DLGPROC)HelpDlgProc);
+					DialogBox(hInst,MAKEINTRESOURCE(IDD_HELPDLG),hDlg,HelpDlgProc);
 					return TRUE;
 			}
 			break;

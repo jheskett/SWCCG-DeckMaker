@@ -5,15 +5,16 @@
 #include <windows.h>
 #include <commdlg.h>
 #include <stdio.h>
+#include "attributes.h"
 #include "SWFile.h"
 #include "resource.h"
 #include "SWDeck.h"
-#include "attributes.h"
 #include "SWStats.h"
-
 
 static OPENFILENAME ofn;  // for open/save
 static OPENFILENAME pofn; // for print to file
+
+extern char *szAppName;
 
 int	FileLength(FILE *fh)
 {
@@ -47,23 +48,23 @@ void stwrite(FILE *fh,char *sz)
 	fputc('\0',fh);
 }
 
-void DoCaption(HWND hwnd,char *szTitleName)
+void DoCaption(HWND hwnd,char *szfName)
 {
-	char szCaption[64+_MAX_FNAME+8];
+	char *szCaption = malloc(strlen(szfName)+128);
 
-	sprintf(szCaption,"%s - %s",
-		szTitleName[0]?szTitleName:UNTITLED);
+	sprintf(szCaption,"%s - %s",szAppName,
+		szfName[0]?szfName:UNTITLED);
 	SetWindowText(hwnd,szCaption);
 }
 
-int AskAboutSave(HWND hwnd,char *szTitleName)
+int AskAboutSave(HWND hwnd,char *szfName)
 {
 	char szBuf[64+_MAX_FNAME+8];
 	int	iReturn;
 
 	sprintf(szBuf,"Save current changes in %s?",
-		szTitleName[0]?szTitleName:UNTITLED);
-	iReturn = MessageBox(hwnd,szBuf,"DeckMaker 3.2",
+		szfName[0]?szfName:UNTITLED);
+	iReturn = MessageBox(hwnd,szBuf,szAppName,
 		MB_YESNOCANCEL|MB_ICONQUESTION);
 
 	if (iReturn==IDYES)
@@ -154,7 +155,7 @@ int matchcard(char *szinName,int cSide,int cSet)
 	int	iResult;
 	char *szName = (char*)malloc(strlen(szinName)+1);
 	strcpy(szName,szinName);
-	// truncate card to just before a unique dot (·,×)
+/*	// truncate card to just before a unique dot (·,×)
 	for (j=0,k=0;j<strlen(szTmp);j++)
 	{
 		if (((szName[j]=='×')||(szName[j]=='·'))&&(j))
@@ -163,7 +164,7 @@ int matchcard(char *szinName,int cSide,int cSet)
 			k=1;
 		}
 	}
-	if (!k) szName[j-1]='\0';
+	if (!k) szName[j-1]='\0';*/
 
 	iResult = -1; // default to fail
 
@@ -219,16 +220,19 @@ BOOL SWFileRead(HWND hwnd,PSTR pstrFileName)
 	int  iHave,iWant,iWB;
 	int	 idx;
 	FILE *fh;
-//	FILE *fdebug;
+	//FILE *fdebug;
 	int	 cSideExclude;
 	HMENU hMenu;
+	BOOL bLoadBadFile = FALSE;
+
+	//char testname[256]; char tside, tset; int tpos;
 
 	hMenu = GetMenu(hwnd);
 
 	if ((fh=fopen(pstrFileName,"r"))==NULL)
 		return FALSE;
 
-//	fdebug = fopen("debug.d","w");
+	//fdebug = fopen("debug.d","w");
 //	fprintf(fdebug,"This file contains the cards not matched in SWFileRead\n");
 
 	cSideExclude='\0';
@@ -254,9 +258,14 @@ BOOL SWFileRead(HWND hwnd,PSTR pstrFileName)
 	}
 	if (strstr(szBuf,"SIDEEXC=l")!=NULL) cSideExclude='l';
 	if (strstr(szBuf,"SIDEEXC=d")!=NULL) cSideExclude='d';
+	if (strstr(szBuf,"CREATORVERSION=3.20")!=NULL) bLoadBadFile = TRUE;
 	// now read the cards one at a time
 	while (!feof(fh))
 	{
+/*		tpos = ftell(fh);
+		fscanf(fh,"%s;%c;%c*\n",testname,&tside,&tset);
+		fseek(fh,tpos,SEEK_SET);
+		fprintf(fdebug,"%s,%c;%c\n",testname,tside,tset);*/
 		fgets(szBuf,4096,fh);		// read the line
 		if (!feof(fh))
 		{
@@ -270,18 +279,23 @@ BOOL SWFileRead(HWND hwnd,PSTR pstrFileName)
 			// this is now a name;side;set;have;want
 			for (i=0;i<strlen(szBuf);i++)
 			{
+				
+				
 				szName[i]=szBuf[i];
 				// if the end of the card name is reached
 				if (szName[i]==';')
 				{
 					szName[i]='\0';
-					cSide = szBuf[i+1]; // name;<side>
+					if (bLoadBadFile)
+						szBuf[i+1]=szBuf[i+1]+('A'-'a');
+					cSide = szBuf[i+1];
+					//fprintf(fdebug,"side=%c\n",cSide);
 					cSet = szBuf[i+3]; // <side>;<set>
 					// find the idx if any (i+1=set,i+5=wb)
 					idx = matchcard(szName,cSide,cSet);
 					if (idx==-1) // if no match, abort processing
 					{
-//						fprintf(fdebug,"%s;%c;%c\n",szName,cSide,cSet);
+						//fprintf(fdebug,"%s;%c;%c\n",szName,cSide,cSet);
 						i=strlen(szBuf);  // skip to end
 					}
 					else
@@ -357,7 +371,7 @@ BOOL SWFileRead(HWND hwnd,PSTR pstrFileName)
 		} // end if !feof loop
 	} // end while !feof loop
 	fclose(fh);
-//	fclose(fdebug);
+	//fclose(fdebug);
 
 	// if this was saved combined, combine but don't affect qty's
 	if (menu.bCombineWB) LoadCombineWB();
@@ -397,7 +411,7 @@ BOOL SWFileWrite(HWND hwnd,PSTR pstrFileName)
 	if ((fh=fopen(pstrFileName,"w"))==NULL)
 		return FALSE;
 
-	sprintf(szTmp,"GAME=swccg;CREATORNAME=DECKMAKER;CREATORVERSION=3.20;VERSION=2.000.1;COMBINE=%s\n",menu.bCombineWB?"TRUE":"FALSE");
+	sprintf(szTmp,"GAME=swccg;CREATORNAME=DECKMAKER;CREATORVERSION=3.21;VERSION=2.000.1;COMBINE=%s\n",menu.bCombineWB?"TRUE":"FALSE");
 	if (menu.bExcludeLight||menu.bExcludeDark)
 	{
 		i = strlen(szTmp)-1;
@@ -417,7 +431,7 @@ BOOL SWFileWrite(HWND hwnd,PSTR pstrFileName)
 			}
 			if (j) szTmp[j-1]='\0';
 			fprintf(fh,"%s;%c;%c;%d;0;%d\n",szTmp,
-				masterlist[cardlist[i].idx].attr[ATT_SIDE]+('a'-'A'),
+				masterlist[cardlist[i].idx].attr[ATT_SIDE],
 				masterlist[cardlist[i].idx].attr[ATT_SET],
 				cardlist[i].deck,cardlist[i].wb);
 		}
@@ -612,5 +626,4 @@ BOOL SWPrintFileWrite(HWND hwnd,PSTR pstrFileName,PSTR pstrPrintFile)
 
 	fclose(fin);
 	fclose(fout);
-	return TRUE;
 }

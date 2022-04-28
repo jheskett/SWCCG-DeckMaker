@@ -7,11 +7,11 @@
 #include <windows.h>
 #include <stdio.h>
 #include <io.h>
+#include <time.h>
+#include "attributes.h"
 #include "SWSpoilers.h"
 #include "SWFile.h"
 #include "SWDeck.h"
-#include "attributes.h"
-#include <time.h>
 
 #define MAXSPOILERLINE 4096
 
@@ -32,7 +32,7 @@ struct splitfields split(char *string,char *toks)
 	next = strtok(copy,toks);
 	while (next != NULL) {
 		rv.szFields = (char**)realloc(rv.szFields,sizeof(char*)*(rv.nFieldCount+1));
-		rv.szFields[rv.nFieldCount] = (char*)malloc(strlen(next)+1);
+		rv.szFields[rv.nFieldCount] = malloc(strlen(next)+1);
 		strcpy(rv.szFields[rv.nFieldCount++],next);
 		strtok(NULL,toks);
 	}
@@ -168,6 +168,8 @@ long parseattr(char *in,char *out,int setidx)
 				out[ATT_WARRIOR]='Y';
 			if (strstr(szBuf,"stromech")!=NULL)
 				out[ATT_ASTRO]='Y';
+			if (strstr(szBuf,"ermanent") && strstr(szBuf,"eapon"))
+				out[ATT_ICON]='p';
 			getfieldstring(12,in,szBuf); // get lore
 			if ((strstr(szBuf,"ounty hunter")!=NULL)||(strstr(szBuf,"ounty hunter")!=NULL))
 				out[ATT_ICON]='B';
@@ -292,7 +294,7 @@ long parseattr(char *in,char *out,int setidx)
 			if (strstr(szBuf,"Executor")!=NULL)
 			{
 				out[ATT_POWER]='<'; out[ATT_ABILITY]='<';
-				out[ATT_DEPLOY]='?'; out[ATT_DEPLOY]='?';
+				out[ATT_FORFEIT]='?'; out[ATT_DEPLOY]='?';
 			}
 			break;
 		case 'v':
@@ -492,13 +494,18 @@ BOOL needtocreateworkfile(void)
 	struct	_finddata_t c_file;
 	time_t	datatm;
 	long	hFile;
+	char search[_MAX_PATH];
 
-	if ( (hFile=_findfirst(DATAFILEN,&c_file))==-1L)
+	sprintf(search,"%s\\%s",szApp,DATAFILEN);
+
+	if ( (hFile=_findfirst(search,&c_file))==-1L)
 		return TRUE; // no SWCCG Cards.dat file, definitely make it
 	datatm = c_file.time_write;
 	_findclose(hFile);
 
-	if ( (hFile=_findfirst("*.dat",&c_file))==-1L)
+	sprintf(search,"%s\\*.dat",szApp);
+
+	if ( (hFile=_findfirst(search,&c_file))==-1L)
 		return TRUE; // leave if no files can be found
 
 	// if a file was created after the data file, one needs to be made
@@ -526,23 +533,34 @@ BOOL createworkfile(HWND hwndProgress)
 	long	number_of_files=0,i=0,z,check=TRUE;
 	FILE	*fin,*fout;
 	char	szBuf[MAXSPOILERLINE],szParsed[MAXSPOILERLINE];
-	BOOL bCont;
+	BOOL	bNoCont;
+	char datsearch[_MAX_PATH];
 
 	if (hwndProgress!=NULL) SetWindowText(hwndProgress,"checking for updates...");
 
-	if (!needtocreateworkfile())
-	{
-		if (hwndProgress!=NULL) SetWindowText(hwndProgress,"creating database...");
-		return TRUE; // no changes, don't bother updating
-	}
 
-	if ( (hFile=_findfirst("*.dat",&c_file))==-1L)
+	memset(&c_file,0,sizeof(c_file));
+
+	sprintf(datsearch,"%s\\*.dat",szApp);
+
+	if ( (hFile=_findfirst(datsearch,&c_file))==-1L)
 		return FALSE; // leave if no files can be found
 
 	// count the number of dat files
 	number_of_files++;
 	while (_findnext(hFile,&c_file)==0) number_of_files++;
 	_findclose(hFile);
+
+	MAXLIST=number_of_files*640;
+	masterlist = malloc(sizeof(struct mcard)*640*number_of_files);
+	cardlist = malloc(sizeof(struct card)*640*number_of_files);
+	decklist = malloc(sizeof(struct card)*640*number_of_files);
+
+	if (!needtocreateworkfile())
+	{
+		if (hwndProgress!=NULL) SetWindowText(hwndProgress,"creating database...");
+		return TRUE; // no changes, don't bother updating
+	}
 
 	sprintf(szBuf,"loading %li sets",number_of_files);
 	if (hwndProgress!=NULL) SetWindowText(hwndProgress,szBuf);
@@ -581,8 +599,8 @@ BOOL createworkfile(HWND hwndProgress)
 					stwrite(fout,szParsed);
 					parsedesc(szBuf,szParsed);
 					stwrite(fout,szParsed);
-					getbool("View","NoUnlimited",&bCont);
-					if (!bCont) break;
+					getbool("View","NoUnlimited",&bNoCont);
+					if (bNoCont) break;
 				}
 			}
 			fgets(szBuf,MAXSPOILERLINE,fin);

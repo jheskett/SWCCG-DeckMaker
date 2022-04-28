@@ -1,7 +1,7 @@
 
 #include <windows.h>
-#include "SWDeck.h"
 #include "attributes.h"
+#include "SWDeck.h"
 #include <string.h>
 #include <stdio.h>
 #include "resource.h"
@@ -9,10 +9,6 @@
 #include "SWStats.h"
 #include <time.h>
 #include "SWPrint.h"
-
-// Variables declared in SWStats.cpp
-struct printeroptions printopt;
-// End...
 
 BOOL findincard(char *szFind,char *szCard)
 {
@@ -267,7 +263,7 @@ long countAttAtt(LPSTR lpBuf,int type1,int att1,int type2,int att2)
 }
 
 // gives a "roll call" of a the number of cards in the list that have a
-// 'type' at the given 'att' (ie. rollcall(lBuf,'L',ATT_SET) will give
+// 'type' at the given 'att' (ie. rollcall(lBuf,'l',ATT_SET) will give
 // the number of Ltd/Unltd cards in the list. (not the number in the deck!)
 int rollcall(LPSTR lpBuf,int type,int att)
 {
@@ -530,7 +526,7 @@ BOOL updatestats(HWND hDlg)
 			break;
 
 		case ID_STATS_SUMMARY:
-			j = countAtt('L',ATT_SIDE);
+			j = countAtt('l',ATT_SIDE);
 			sprintf(szBuf,"%d light side\t%d dark side",j,total-j);
 			SendMessage(hList,LB_ADDSTRING,0,(LPARAM)szBuf);
 			spreadAtt('*','*',ATT_DESTINY,szBuf);
@@ -542,6 +538,12 @@ BOOL updatestats(HWND hDlg)
 			li = countAtt('L',ATT_TYPE);
 			calc(li,total,szDraw,szHand);
 			sprintf(szLine,"location\t%li\t%s\t%s\t%s",li,szBuf,szDraw,szHand);
+			SendMessage(hList,LB_ADDSTRING,0,(LPARAM)szLine);
+
+			spreadAtt('O','*',ATT_DESTINY,szBuf);
+			li = countAtt('O',ATT_TYPE);
+			calc(li,total,szDraw,szHand);
+			sprintf(szLine,"objective\t%li\t%s\t%s\t%s",li,szBuf,szDraw,szHand);
 			SendMessage(hList,LB_ADDSTRING,0,(LPARAM)szLine);
 
 			spreadAtt('C','*',ATT_DESTINY,szBuf);
@@ -854,7 +856,7 @@ BOOL updatestats(HWND hDlg)
 			SendMessage(hList,LB_ADDSTRING,0,(LPARAM)szLine);
 			sprintf(szLine,"dark force generation\t%li",totalAtt('L','*',ATT_IFORCE));
 			SendMessage(hList,LB_ADDSTRING,0,(LPARAM)szLine);
-			sprintf(szLine,"light force generation\t%li",totalAtt('L','*',ATT_RFORCE));
+			sprintf(szLine,"light force generation\t%li",totalAtt('l','*',ATT_RFORCE));
 			SendMessage(hList,LB_ADDSTRING,0,(LPARAM)szLine);
 			break;
 
@@ -863,8 +865,8 @@ BOOL updatestats(HWND hDlg)
 			spreadAtt('I','U',ATT_DESTINY,szBuf);
 			sprintf(szLine,"used\t\t%li\t%s",countAttAtt('I',ATT_TYPE,'U',ATT_SUBTYPE),szBuf);
 			SendMessage(hList,LB_ADDSTRING,0,(LPARAM)szLine);
-			spreadAtt('I','L',ATT_DESTINY,szBuf);
-			sprintf(szLine,"lost\t\t%li\t%s",countAttAtt('I',ATT_TYPE,'L',ATT_SUBTYPE),szBuf);
+			spreadAtt('I','l',ATT_DESTINY,szBuf);
+			sprintf(szLine,"lost\t\t%li\t%s",countAttAtt('I',ATT_TYPE,'l',ATT_SUBTYPE),szBuf);
 			SendMessage(hList,LB_ADDSTRING,0,(LPARAM)szLine);
 			spreadAtt('I','B',ATT_DESTINY,szBuf);
 			sprintf(szLine,"used/lost    \t%li\t%s",countAttAtt('I',ATT_TYPE,'B',ATT_SUBTYPE),szBuf);
@@ -1035,7 +1037,7 @@ BOOL sendtoclipboard(char *filen)
 	DeleteFile(filen);
 
 	hGMem = GlobalAlloc(GHND,iLength+1);
-	pGMem = (char*)GlobalLock(hGMem);
+	pGMem = GlobalLock(hGMem);
 	for (i=0;i<iLength;i++)
 		*pGMem++ = pTempFile[i];
 	GlobalUnlock(hGMem);
@@ -1172,7 +1174,7 @@ BOOL printstats(HWND hDlg,UINT uDest)
 			break;
 
 		case ID_STATS_SUMMARY:
-			j = countAtt('L',ATT_SIDE);
+			j = countAtt('l',ATT_SIDE);
 			sprintf(szBuf,"%d light side  %d dark side",j,total-j);
 			fprintf(fh,"%s\n",szBuf);
 			spreadAtt('*','*',ATT_DESTINY,szBuf);
@@ -1184,6 +1186,11 @@ BOOL printstats(HWND hDlg,UINT uDest)
 			li = countAtt('L',ATT_TYPE);
 			calc(li,total,szDraw,szHand);
 			fprintf(fh,"%10s %10li %10s %6s %6s\n","location",li,szBuf,szDraw,szHand);
+
+			spreadAtt('O','*',ATT_DESTINY,szBuf);
+			li = countAtt('O',ATT_TYPE);
+			calc(li,total,szDraw,szHand);
+			fprintf(fh,"%10s %10li %10s %6s %6s\n","objective",li,szBuf,szDraw,szHand);
 
 			spreadAtt('C','*',ATT_DESTINY,szBuf);
 			li = countAtt('C',ATT_TYPE);
@@ -1561,7 +1568,7 @@ BOOL printdeck(HWND hwnd)
 			if (printopt.bSSide&&(masterlist[cardlist[i].idx].attr[ATT_SIDE]!=cSide))
 			{
 				cSide=masterlist[cardlist[i].idx].attr[ATT_SIDE];
-				if (cSide=='L') fprintf(fh,"\nLight Side ");
+				if (cSide=='l') fprintf(fh,"\nLight Side ");
 				else fprintf(fh,"\nDark Side ");
 				fprintf(fh,"(%li)\n",countAtt(cSide,ATT_SIDE));
 			}
@@ -1593,7 +1600,7 @@ BOOL printdeck(HWND hwnd)
 				cType=masterlist[cardlist[i].idx].attr[ATT_TYPE];
 				switch (cType)
 				{
-					case 'L': fprintf(fh,"\nLocations (%li)\n",countAtt('L',ATT_TYPE)); break;
+					case 'l': fprintf(fh,"\nLocations (%li)\n",countAtt('l',ATT_TYPE)); break;
 					case 'C': fprintf(fh,"\nCharacters (%li)\n",countAtt('C',ATT_TYPE)); break;
 					case 'S': fprintf(fh,"\nStarships (%li)\n",countAtt('S',ATT_TYPE)); break;
 					case 'V': fprintf(fh,"\nVehicles (%li)\n",countAtt('V',ATT_TYPE)); break;

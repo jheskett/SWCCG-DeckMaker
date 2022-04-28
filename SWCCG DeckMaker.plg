@@ -1,0 +1,34 @@
+--------------------Configuration: SWCCG DeckMaker - Win32 Debug--------------------
+Begining build with project "K:\deckmaker31\SWCCG DeckMaker.dsp", at root.
+Active configuration is Win32 (x86) Application (based on Win32 (x86) Application)
+
+Project's tools are:
+			"32-bit C/C++ Compiler for 80x86" with flags "/nologo /MLd /W3 /Gm /GX /Zi /O1 /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR"debug/" /Fp"debug/SWCCG DeckMaker.pch" /YX /Fo"debug/" /Fd"debug/" /FD /c "
+			"OLE Type Library Maker" with flags "/nologo /D "_DEBUG" /mktyplib203 /win32 "
+			"Win32 Resource Compiler" with flags "/l 0x409 /fo"debug/resource.res" /d "_DEBUG" "
+			"Browser Database Maker" with flags "/nologo /o"debug/SWCCG DeckMaker.bsc" "
+			"COFF Linker for 80x86" with flags "kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /incremental:yes /pdb:"debug/SWCCG DeckMaker.pdb" /debug /machine:I386 /out:"debug/SWCCG DeckMaker.exe" "
+			"Custom Build" with flags ""
+			"<Component 0xa>" with flags ""
+
+Creating temp file "L:\TEMP\RSPA5.tmp" with contents </nologo /MLd /W3 /Gm /GX /Zi /O1 /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FR"debug/" /Fp"debug/SWCCG DeckMaker.pch" /YX /Fo"debug/" /Fd"debug/" /FD /c 
+"K:\deckmaker31\SWSpoilers.c"
+>
+Creating command line "cl.exe @L:\TEMP\RSPA5.tmp" 
+Creating temp file "L:\TEMP\RSPA6.tmp" with contents <kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib /nologo /subsystem:windows /incremental:yes /pdb:"debug/SWCCG DeckMaker.pdb" /debug /machine:I386 /out:"debug/SWCCG DeckMaker.exe" 
+.\debug\Ezfont.obj
+".\debug\SWCCG DeckMaker.obj"
+.\debug\SWDeck.obj
+.\debug\SWFile.obj
+.\debug\SWPrint.obj
+.\debug\SWSpoilers.obj
+.\debug\SWStats.obj
+.\debug\resource.res>
+Creating command line "link.exe @L:\TEMP\RSPA6.tmp" 
+Compiling...
+SWSpoilers.c
+Linking...
+
+
+
+SWCCG DeckMaker.exe - 0 error(s), 0 warning(s)
