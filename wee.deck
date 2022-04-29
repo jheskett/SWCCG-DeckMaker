@@ -1,0 +1,11 @@
+GAME=swccg;CREATORNAME=DECKMAKER;CREATORVERSION=3.21;VERSION=2.000.1;COMBINE=FALSE
+Alderaan;d;p;1;0;0
+Alderaan;d;U;1;0;0
+Alderaan;l;p;1;0;0
+Alderaan;l;U;1;0;0
+Anoat;d;d;1;0;0
+Anoat;l;d;1;0;0
+Asteroid Field;d;d;1;0;0
+Asteroid Field;l;d;1;0;0
+Bespin;d;c;1;0;0
+ENDCARDS
