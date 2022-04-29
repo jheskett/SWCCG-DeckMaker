@@ -1,11 +1,10 @@
 // SWDeck.h
 
-#include <windows.h>
-
 // MAXLIST is the number of unique cards loadable.  There are just under 500
 // cards in existence(as of ANH), so 1200 should be safe for some time to come.
 // Any masterlist idx that = MAXLIST is an invalid card.
-#define MAXLIST			1200
+extern int MAXLIST;
+#define MAXLIKELY 15000
 
 #define MAXATTR			16
 #define MAXNAME			60
@@ -35,6 +34,7 @@ struct mcard
 {
 	char *attr;			// pointer to attribute string in pCardData
 	char *name;			// pointer to card name string in pCardData
+	char *lore;			// pointer to lore text string in pCardData
 	char *desc;			// pointer to game text string in pCardData
 	BOOL bValid;		// TRUE=card is valid, FALSE=card is not valid
 
@@ -42,26 +42,29 @@ struct mcard
 	float fPrice;		// numerical representation of the card's value
 
 	int	 rank;			// card's ranking in the current sort order
-	int  icons[7];		// list of indexes into hIcons[], not the UINT id
+	int  icons[8];		// list of indexes into hIcons[], not the UINT id
 
 };
-struct mcard masterlist[MAXLIST];
+struct mcard *masterlist;
 
 struct card
 {
-	int	 idx;
-	int  deck;
-	int  inventory;
+	int	 idx;		// index into masterlist
+	int  deck;		// qty in the deck
+	int  wb;		// placeholder for combining wb
+	int  binder;	// qty in binder
 	BOOL bValid;
 };
-struct card cardlist[MAXLIST];
-struct card decklist[MAXLIST];
+struct card *cardlist;
+struct card *decklist;
 
-#define MAXSETS 16
-char sets[MAXSETS][20];	// defined in WM_CREATE from swccgdm.set: set names
+#define MAXSETS 25
+char sets[MAXSETS][30];	// defined in WM_CREATE from swccgdm.set: set names
 						// and codes. sets[][0]==code, sets[][1]==name
 
-int  OpenSWCCGData(void);
+HWND    hDlgStats;
+
+int  OpenSWCCGData(HWND hwndProgress);
 void CloseSWCCGData(void);
 void ResetSWCCGData(void);
 
@@ -70,6 +73,7 @@ int  ExcludeCList(int att,int c,BOOL bLeave);
 
 void ExportData(void);
 void ImportData(void);
+void CreateOldData(void);
 
 void MsgError(HWND hwnd,int err,char *caption);
 
@@ -78,12 +82,12 @@ BOOL getsets(HWND hwnd);
 void DefineICO(HANDLE hInst);
 void DeleteICO(void);
 
-#define NUMICONS 81
-HBITMAP	hIcons[NUMICONS];
+//HBITMAP	hIcons[ICO_MAX];
+HIMAGELIST hImageLists[10];
 HBITMAP hBlankRow;
 HBRUSH	hDarkBrush;
 BOOL	bHighColorMode;
-HBRUSH	hBr[7];
+HBRUSH	hBr[8];
 #define	BR_RED		0
 #define BR_BLACK	1
 #define BR_GREY		2
@@ -91,8 +95,10 @@ HBRUSH	hBr[7];
 #define BR_GREEN	4
 #define BR_PURPLE	5
 #define BR_DKGREY	6
+#define BR_DKGREEN  7
 
 void DrawBitmap(HDC hdc,HBITMAP hBitmap,int xStart,int yStart);
+void DrawBackBitmap(HDC hdc,HBITMAP hBitmap,int xStart, int yStart);
 void DrawCardIcons(HDC hdc,int card,int xStart,int yStart);
 
 struct menustates
@@ -112,9 +118,24 @@ struct menustates
 	BOOL	bDeckQty;
 	BOOL	bDeckWindow;
 	BOOL	bInfoWindow;
+	BOOL	bFindName;
+	BOOL	bFindLore;
+	BOOL	bFindDesc;
+	BOOL	bFindLight;
+	BOOL	bFindDark;
+	BOOL	bKeepFind;
+	UINT	iStatsMode;
+	UINT	iRangeMode;
+	BOOL    bNoUnlimited;
+	BOOL	bCombineWB;
+	BOOL	bExcludeLight;
+	BOOL	bExcludeDark;
+	BOOL	bBinderQty;
+	BOOL	bSaveStates;
 } menu;
 
 UINT	uSortOrder;
+UINT	uPrevStats;
 
 BOOL ToggleMenu(HMENU hMenu,UINT id,BOOL *state);
 
@@ -125,10 +146,38 @@ char  szSort[MAXSORT];
 void newsort(char *sortkey);
 
 int  updatedeck(HWND hDlg);
+void parsename(char *newname, char *oldname);
 
-static RECT	rMainWin,rDeckWin,rInfoWin;
+RECT	rMainWin,rDeckWin,rInfoWin,rStatsWin;
 
-char  szPriceGuideSource[256];
+char  szPriceGuideSource[512];
 char  szPriceGuideDate[16];
 
 BOOL  bPriceGuideChanged;
+
+#define DATAFILEN  "SWCCG Cards.dm"
+#define PRICEFILEN "SWCCG Price Guide.dm"
+#define SETSFILEN  "SWCCG Sets.dm"
+
+BOOL  CombineWB(void);
+BOOL  LoadCombineWB(void);
+
+void UpdateOnlyMenu(HWND);
+
+char szApp[_MAX_PATH];
+char szIni[_MAX_PATH];
+
+void WriteMenuProfile(void);
+void GetMenuProfile(HMENU);
+
+#define MAXORDERSIZE 32
+
+int	 iOrderMode;
+#define ORDERTYPE 1
+#define ORDERSETS 2
+
+char szTypeOrder[32];
+
+HBITMAP hPalBmp;
+
+void getbool(char *szSect,char *szItem,BOOL *b);

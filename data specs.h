@@ -17,12 +17,14 @@ Byte	Use
 		LT	= site
 		LM	= mobile system
 		LV	= mobile site
+		LS	= sector
 
 		C	= character
 		CR	= rebel
 		CI	= imperial
 		CA	= alien
 		CD	= droid
+		CJ	= jedi master
 
 		R	= creature
 
@@ -40,6 +42,7 @@ Byte	Use
 		IL	= lost
 		IU	= used
 		IB	= used or lost
+		IS	= starting
 
 		E	= effect
 		EE	= normal
@@ -56,15 +59,18 @@ Byte	Use
 
 		N	= event
 
+		J	= jedi test
+
 3		Deploy/Interior or Exterior site(I or E)
 4		Forfeit
 5		Power/Ferocity/Rebel Force
 6		Ability/Armor/Maneuver/Defense/Imperial Force
 7		Pilot(Y/N)/Hyperdrive/Landspeed/Parsec
 8		Warrior(Y/N)/Perm. Pilot(Y/N)
-9		Rarity		R  U  C   N
-10		Subrarity	12 12 123 A
-11		Set			L(Premiere) P(2P) A(ANH) R(Rebel Leader)
+9		Rarity		R   U   C    N
+10		Subrarity	012 012 0123 A
+11		Set
+			L(Premiere) P(2P) A(ANH) R(Rebel Leader)
 12		Side L or D (light or dark)
 13		Astromech(Y/N)
 14		extra icon

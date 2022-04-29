@@ -1,0 +1,6 @@
+d;c;a;P;*;Boba Fett With ?;NA;1;P:4 A:3 R:5;;Pilot, Warrior, Permanent Weapon;;
+d;c;i;P;*;Darth Vader With Lightsaber;NA;1;P:6 A:6;Dark Jedi;Pilot, Warrior, Permanent Weapon;;
+l;c;r;P;*;Han With Heavy Blaster Pistol;NA;1;P:4 A:3 D:4 F:6;Force-Attuned;Pilot, Warrior, Permanent Weapon;Scoundrel, {smuggler}, {gambler} and risk taker. "Everything's going to be fine. Trust me.";Adds 3 to power of anything he pilots. Adds one battle destiny if with Luke or Chewie. Permanent weapon is *Han's Heavy Blaster Pilstol (may target a character or creature for free| draw destiny| target hit, and its forfeit = 0, if destiny +1 > defense value).
+l;c;r;P;*;Leia With ?;NA;1;;;Pilot, Warrior, Permanent Weapon;;
+l;c;r;P;*;Luke With Lightsaber;NA;1;P:5 A:5;Force-Sensitive;Pilot, Warrior, Permanent Weapon;;
+l;c;r;P;*;Obi-Wan With Lightsaber;NA;1;P:5 A:6;Jedi Knight;Warrior, Permanent Weapon;;

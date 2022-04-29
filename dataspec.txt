@@ -1,0 +1,215 @@
+SW:CCG Delimited Data Specification
+
+INTRODUCTION
+
+  I originally wrote these files to ease my production of spoilers for
+  SW:CCG.  They were made to be easy to write in your favorite text editor
+  (vile) and easy for regular expressions to chew on. I've done my best
+  to eliminate spelling errors, particularly in the icon fields. Since
+  they were made for human readable input/output, little effort was made
+  to make it easy to generate machine readable lists. David Sisson took
+  it upon himself to write Perl code to convert between these data files
+  and Jeff Heskett's (now defunct) DeckMaker data files; Proving that
+  it can be done relatively easily, with the correct tools.
+
+DATAFILE
+
+  o Each line in the datafile is a separate card.
+  o Each field is separated by a semicolon (;)
+  o Depending on content, fields may have 0 to n characters.
+  o There is no escape for representing a (;) in a field. Sorry.
+  o Any text which should be represented in bold is surrounded by
+    curly braces. This is for words like {Thief}, {Cumulatively},
+    {Gunner}, etc.
+  o There is no escape for representing a curly brace "{", "}". Sorry.
+
+  
+  Common Fields
+
+    o Every card has the first 7 fields in common:
+
+      1. Side of the force: 1 Character
+        l : light
+        d : dark
+
+      2. Type: 1 Character
+        c : character
+        d : device
+        e : effect
+        E : event
+	o : objective
+        i : interrupt
+        j : jedi test
+        l : location
+        r : creature
+        s : starship
+        v : vehicle
+        w : weapon
+
+      3. Subtype: 1 Character
+        Dependant on Type (see type specific information)
+
+      4. Set: 1 Character
+        p : Premiere
+        i : Premiere Introductory 2 Player Game
+        h : Hoth
+        a : A New Hope
+        E : Empire Strikes Back Introductory 2 Player Game
+        r : Rebel Leader
+        j : Jedi Pack
+        d : Dagobah           
+        c : Cloud City
+        s : Special Edition
+        t : Tatooine
+        e : Endor
+        D : Death Star
+
+      5. Uniqueness: String
+        One asterisk (*) for each uniqueness dot by the name
+          OR
+        A set of less than (<) greater than (>) symbols to represent a per
+        system restriction. Eg. <>Space Slug
+
+      6. Name: String
+
+      7. Rarity: String
+        
+  Type Specific Fields
+
+    o Characters
+      3. Subtype
+        a : alien
+        d : droid
+        i : imperial
+        r : rebel
+        R : rebel/alien
+        j : jedi master
+      8. Destiny: String
+        Although usually a single character for the destiny, some cards make
+        it difficult to represent their destiny this way. Eg. Brainiac's
+        destiny is pi, difficult to represent in ASCII.
+      9. Statistics: String
+        In the form "P:n A:n D:n R:n F:n" where P=power, A=Ability, R=Armor,
+        D=Deploy F=Forfeit; Characters not having one of the statistics
+        will simply be missing that statistic, eg Droids do not have Ability.
+      10. Icons: String
+      11. Lore: String
+      12. Game Text: String
+
+    o Creatures
+      3. Subtype
+        1 Character, Not applicible
+      8. Destiny: String
+      9. Statistics: String
+        In the form "P:n R:n D:n F:n" where P=Ferocity, R=Defense (think aRmor),
+        D=Deploy, F=Forfeit)
+      10. Icons: String
+      11. Lore: String
+      12. Game Text: String
+
+    o Devices
+      3. Subtype
+        1 Character, Not applicible
+      8. Destiny: String
+      9. Statistics: String
+        Currently, all device statistics are blank
+      10. Icons: String
+        Currently, all device icons are blank
+      11. Lore: String
+      12. Game Text: String
+
+    o Effects
+      3. Subtype
+        u : Utinni Effect
+        e : Effect
+        i : Immediate Effect
+        m : Mobile Effect
+        t : Effect This Is
+      8. Destiny: String
+      9. Lore: String
+      10. Game Text: String
+
+    o Events
+      3. Subtype
+        1 Character, Not applicible
+      8. Destiny: String
+      9. Lore: String, Not applicable
+      10. Game Text: String
+     
+    o Objectives
+      3. Subtype
+        1 Character, Not applicable
+      8. Front Destiny: String
+      9. Front Game Text: String
+      10. Back Destiny: String
+      11. Back Game Text: String
+
+    o Interrupts
+      3. Subtype
+        l : Lost
+        u : Used
+        o : Used Or Lost
+      8. Destiny: String
+      9. Lore: String
+      10. Game Text: String
+
+    o Jedi Test
+      3. Subtype
+        1 Character, Test Number
+      8. Destiny: String
+      9. Lore: String
+        Currently, all Jedi Test lore is blank
+      10. Game Text: String (square brackets "[]" around a phrase denotes
+        italics.)
+
+    o Locations
+      3. Subtype
+        S : System
+        s : Site
+        e : Sector
+      8. Location: String
+        For systems: "Parsec n"
+        For exterior Hoth sites: "nth Marker"
+      9. Icons: String
+      10.
+
+    o Starships
+      3. Subtype
+        c : Capitol
+        f : Fighter
+        s : Squadron
+      8. Destiny: String
+      9. Statistics: String
+        In the form P:n M:n A:n H:n D:n F:n (P=Power, M=Maneuver, A=Armor,
+        H=Hyperspeed, D=Deploy, F=Forfeit) Fields which are N/A are blank.
+      10. Icons: String
+      11. Lore: String
+      12. Game Text: String
+
+    o Vehicles
+      3. Subtype
+        c : Combat
+        a : Creature
+        t : Transport
+        s : Shuttle
+      8. Destiny: String
+      9. Statistics: String
+        In the form P:n M:n A:n L:n D:n F:n (P=Power, M=Maneuver, A=Armor,
+        L=Landspeed, D=Deploy, F=Forfeit) Fields which are N/A are blank.
+      10. Icons: String
+      11. Lore: String
+      12. Game Text: String
+
+    o Weapons
+      3. Subtype
+        c : Character
+        a : Automated
+        s : Starship
+        v : Vehicle
+        r : Artillery
+      8. Destiny: String
+      9. Statistics: String
+        In the form D:n F:n (D=Deploy, F=Forfeit) Fields which are N/A are blank.
+      10. Icons: String
+      11. Lore: String
+      12. Game Text: String
